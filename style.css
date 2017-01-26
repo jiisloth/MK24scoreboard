@@ -1,26 +1,91 @@
+@font-face {
+    font-family: "My Custom Font";
+    src: url(font/CyberSloth.ttf) format("truetype");
+}
 body{
+    font-family: "My Custom Font", sans-serif, Tahoma;
     background-color: #80ff5a;
     padding: 0;
     margin: 0;
 }
+#scoreboard{
+    display: none;
+}
+
 .cupHolder{
     width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+.cup{
+    width: 48%;
+    display: flex;
+    justify-content: space-around;
+}
+.divider{
+    width: 2%;
+    display: block;
 }
 #container{
     width: 100%;
-    height: 600px;
+    height: 10px;
     background-color: yellow;
 }
+#marker{
+    margin-left: 200px;
+    height: 100px;
+    display: flex;
+    justify-content: space-around;
+}
+.numberSlot{
+    display: block;
+    font-size: 40px;
+    width: 40px;
+    text-align: center;
+}
+.playerSlot{
+    display: table;
+}
+.name{
+    font-size: 40px;
+    width: 200px;
+    padding-left: 20px;
+    display: table-cell;
+    vertical-align: middle;
+    overflow: hidden;
+}
+.score{
+    height: 100%;
+}
+.playerImageHolder{
+    height: 100%;
+    position: relative;
+}
+
+.playerImage{
+    position: absolute;
+    bottom: 0;
+}
+
+
 .map{
-    width: 25%;
+    display: block;
+    width: 22%;
 }
 .mapCount{
+    margin-top: -40px;
     height: 40px;
-    margin-top: -45px;
     font-size: 30px;
     text-align: right;
     padding-right: 10px;
-}
+    color: #ffffff;
+    text-shadow:
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+         2px 2px 0 #000;
+    }
 .mapImage{
     width: 100%;
+    display: block;
 }
