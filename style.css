@@ -2,12 +2,30 @@
     font-family: "My Custom Font";
     src: url(font/CyberSloth.ttf) format("truetype");
 }
+body, html{
+    width: 100%;
+    height: 100%;
+}
 body{
     font-family: "My Custom Font", sans-serif, Tahoma;
     background-color: #80ff5a;
     padding: 0;
     margin: 0;
 }
+#settings{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+#gameSettings{
+
+}
+#playerSettings{
+    display: none;
+}
+
 #scoreboard{
     display: none;
 }
@@ -15,16 +33,12 @@ body{
 .cupHolder{
     width: 100%;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 .cup{
     width: 48%;
     display: flex;
-    justify-content: space-around;
-}
-.divider{
-    width: 2%;
-    display: block;
+    justify-content: space-between;
 }
 #container{
     width: 100%;

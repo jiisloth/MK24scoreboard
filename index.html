@@ -8,12 +8,37 @@
     <title></title>
 </head>
 <body>
+<div id="settings">
+    <div id="gameSettings">
+        <label for="roundInput">How many rounds?</label>
+        <br>
+        <input id="roundInput" type="number" min="1" value="24"/>
+        <br>
+        <label for="playerInput">How many players?</label>
+        <br>
+        <input id="playerInput" type="number" min="1" value="10"/>
+        <br>
+        <label for="betterRandom">Better random: </label><input id="betterRandom" type="checkbox">
+        <br>
+        <input id="getGameSettings" type="button" value="Next">
+    </div>
+    <div id="playerSettings">
+        <label for="nameInput">Name:</label>
+        <br>
+        <input id="nameInput" type="text"/>
+        <br>
+        <div id="iconHolder">
+
+        </div>
+        <input id="getPlayerSettings" type="button" value="Next">
+    </div>
+</div>
+
 <div id="scoreboard">
     <div id="top" class="cupHolder">
     <div id="cup1" class="cup">
 
     </div>
-    <div class="divider"></div>
     <div id="cup2" class="cup"></div>
 </div>
 <div id="container">
@@ -23,7 +48,6 @@
 </div>
 <div id="bottom" class="cupHolder">
     <div id="cup3" class="cup"></div>
-    <div class="divider"></div>
     <div id="cup4" class="cup"></div>
 </div>
 </div>
