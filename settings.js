@@ -8,6 +8,7 @@ var players = [];
 var playerCount = 0;
 var iconChoice = "";
 
+var betterRandom;
 
 var rounds = 24;
 
@@ -34,17 +35,38 @@ function shuffle(array) {
 
 
 function initNextPlayer(){
-    $("#nameInput").val("")
+    $("#nameInput").val("").focus();
     iconChoice = "";
+    $(".iconChoice").removeClass("highlight");
 }
 
+function nextPlayer() {
+    if (iconChoice == "" && $("#nameInput").val() == "jsloth") {
+        iconChoice = "misato";
+    }
 
+    if (iconChoice != "" && $("#nameInput").val() != "") {
+        var player = [$("#nameInput").val(), iconChoice, 0];
+        $("#" + iconChoice + "Button").remove();
+
+        players.push(player);
+        initNextPlayer();
+        if (players.length >= playerCount) {
+            players = shuffle(players);
+            window.location.href = "scoreboard.html?players=" + encodeURI(players) + "&rounds=" + rounds + "&betterRandom=" + betterRandom + "&seed=" + Math.floor(Math.random() * 100000) + "&mapNumber=" + 0;
+
+        }
+
+
+    }
+}
 
 $(document).ready(function () {
     
     $("#getGameSettings").click( function () {
         rounds = parseInt($("#roundInput").val());
         playerCount = $("#playerInput").val();
+        betterRandom = $("#betterRandom").is(':checked');
         $("#gameSettings").hide();
         $("#playerSettings").show();
         initNextPlayer()
@@ -53,39 +75,25 @@ $(document).ready(function () {
     
     for (i = 0; i < icons.length; i++){
         iconButton = $('<img id="' + icons[i] + 'Button" class="iconChoice" src="images/playerIcons/'+ icons[i] + '.png">');
-        if (i % 5 == 0){
-            $('<br>').appendTo($("#iconHolder"));
-        }
         iconButton.appendTo($("#iconHolder"));
     }
 
     $(".iconChoice").click( function () {
-        $(".iconChoice").css('border-width', '0');
-        $(this).css('border', '3px solid black');
+        $("#nameInput").focus();
+        $(".iconChoice").addClass("highlight");
+        $(this).removeClass("highlight");
         iconChoice = $(this).attr('id').replace("Button", "");
     });
 
     $("#getPlayerSettings").click( function () {
-        if (iconChoice == "" && $("#nameInput").val() == "jsloth") {
-            iconChoice = "misato";
-        }
-
-        if (iconChoice != "" && $("#nameInput").val() != ""){
-            var player = [$("#nameInput").val(), iconChoice, 0];
-            $("#" + iconChoice + "Button").remove();
-
-            players.push(player);
-            initNextPlayer();
-            if (players.length >= playerCount) {
-                players = shuffle(players);
-                window.location.href = "scoreboard.html?players="+ encodeURI(players) + "&rounds="+rounds;
-
-            }
-
-
-        }
+        nextPlayer()
     });
 
+    document.addEventListener('keydown', function(event) {
+        if ( event.keyCode == 13 ) {
+            nextPlayer()
+        }
+    });
 
 
 

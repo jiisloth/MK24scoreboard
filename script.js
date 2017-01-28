@@ -4,15 +4,19 @@
 
 
 var maps = ["LuigiCircuit", "PeachBeach", "BabyPark", "DryDryDesert", "MushroomBridge", "MarioCircuit", "DaisyCruiser", "WaluigiStadium", "SherbetLand", "MushroomCity", "YoshiCircuit", "DKMountain", "WarioColosseum", "DinoDinoJungle", "BowserCastle", "RainbowRoad"];
+var mapCount = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
 
-var icons = ["mario", "luigi", "bowser", "peach", "daisy", "yoshi", "toad", "toadette", "donkeykong", "boo", "koopa", "klunk", "chuck", "link", "chiken", "bubble", "mage", "megaman", "pikachu", "samus", "sonic"]
+var betterRandom;
+var seed;
+var mapNumber;
+
 
 var players = [];
-var playerCount = 0;
-var iconChoice = "";
 
-var playing = [];
-var que = [];
+var mapList = [];
+
+var playing = [0,1,2,3];
+var que = [4,5,6,7,8,9];
 
 var jonne = "none";
 
@@ -23,7 +27,6 @@ var lastPlayer = [];
 
 
 function playerMove(id) {
-    if (playing.indexOf(id) != -1){
         players[id][2] += 1;
         var temp = playing[playing.indexOf(id)];
         playing[playing.indexOf(id)] = que[0];
@@ -32,7 +35,6 @@ function playerMove(id) {
         que.push(temp);
         checkJonne();
         updateQue();
-    }
 }
 
 function checkJonne() {
@@ -70,28 +72,27 @@ function checkJonne() {
 
 
 function undoMove() {
-    if (lastPlayer.length > 0) {
-        var lastOne = lastPlayer.pop();
-        if (typeof lastOne === "string"){
-            lastOne = parseInt(lastOne.split(":")[1]);
-            var errorOne = que.pop();
-            playing[playing.indexOf(lastOne)] = errorOne;
-            que.unshift(lastOne);
-            lastPlayer.push(errorOne);
+    var lastOne = lastPlayer.pop();
+    if (typeof lastOne === "string"){
+        lastOne = parseInt(lastOne.split(":")[1]);
+        var errorOne = que.pop();
+        playing[playing.indexOf(lastOne)] = errorOne;
+        que.unshift(lastOne);
+        lastPlayer.push(errorOne);
 
-        } else {
-            var errorOne = que.pop();
-            playing[playing.indexOf(lastOne)] = errorOne;
-            que.unshift(lastOne);
-            players[errorOne][2] -= 1;
-            $("#playerImage" + errorOne).css({
-                'right': '-' + ($(".numberSlot").width() * (1 + players[errorOne][2]) - 5) + 'px',
-                'left': 'auto'
-            });
-        }
-        checkJonne();
-        updateQue();
+    } else {
+        var errorOne = que.pop();
+        playing[playing.indexOf(lastOne)] = errorOne;
+        que.unshift(lastOne);
+        players[errorOne][2] -= 1;
+        $("#playerImage" + errorOne).css({
+            'right': '-' + ($(".numberSlot").width() * (1 + players[errorOne][2]) - 5) + 'px',
+            'left': 'auto'
+        });
     }
+    checkJonne();
+    updateQue();
+
 }
 
 function skippy() {
@@ -108,25 +109,16 @@ function skippy() {
     updateQue();
 }
 
-function updateQue(){
-    for (i = 0; i < playing.length; i++) {
-        var div = $("#player" + (playing[i])+" .name"+" .turnNumber");
-       div.html( $("<img src='images/icons/player" + (i + 1) + ".png'>"));
-    }
-    for (i = 0; i < que.length; i++) {
-        var div = $("#player" + (que[i])+" .name"+" .turnNumber");
-        div.text((i + 1) +".");
-    }
-
-
-}
 
 function writeCookie() {
-   var now = new Date();
-   now.setMonth( now.getMonth() + 1 );
-   document.cookie = "?players="+ encodeURI(players) + "&rounds="+rounds+";expires=" + now.toUTCString() + ";";
+    var now = new Date();
+    now.setMonth(now.getMonth() + 1);
+    if (lastPlayer.length > 0) {
+        document.cookie = "?players=" + encodeURI(players) + "&rounds=" + rounds +  "&betterRandom=" + betterRandom + "&seed=" + seed + "&mapNumber=" + mapNumber + "&lastPlayer=" + lastPlayer + "&playing=" + playing + "&que=" + que + "&mapCount=" + mapCount + ";expires=" + now.toUTCString() + ";";
+    } else {
+        document.cookie = "?players=" + encodeURI(players) + "&rounds=" + rounds +  "&betterRandom=" + betterRandom + "&seed=" + seed + "&mapNumber=" + mapNumber + ";expires=" + now.toUTCString() + ";";
+    }
 }
-
 
 function readParameters(){
     var params = window.location.search;
@@ -140,6 +132,29 @@ function readParameters(){
     }
     params = params.substring(1).split("&");
 
+    if (params.length > 5) {
+        lastPlayer = params[5].split("=")[1].split(",");
+        for (i = 0; i < lastPlayer.length; i++) {
+            if (!isNaN(lastPlayer[i])) {
+                lastPlayer[i] = parseInt(lastPlayer[i])
+            }
+        }
+        playing = params[6].split("=")[1].split(",");
+        for (i = 0; i < playing.length; i++) {
+            playing[i] = parseInt(playing[i])
+        }
+        que = params[7].split("=")[1].split(",");
+        for (i = 0; i < que.length; i++) {
+            que[i] = parseInt(que[i])
+        }
+        mapCount = params[8].split("=")[1].split(",");
+        for (i = 0; i < mapCount.length; i++) {
+            mapCount[i] = parseInt(mapCount[i])
+        }
+    }
+    betterRandom = (params[2].split("=")[1] == "true");
+    seed = parseInt(params[3].split("=")[1]);
+    mapNumber = parseInt(params[4].split("=")[1]);
     rounds = parseInt(params[1].split("=")[1]);
     params = decodeURI(params[0].split("=")[1]).split(",");
     var player = [];
@@ -157,18 +172,60 @@ function readParameters(){
     }
 
 }
+// ?players=qweqwe,donkeykong,0,qweqwe,daisy,0,qweqw,toadette,0,asds,toad,0,qawewq,peach,0,awdaw,luigi,0,asdsd,yoshi,0,weq,bowser,0,asdad,mario,0,qweq,mage,0&rounds=24
 
-function setOrder(){
-    for (i = 1; i <= players.length; i++) {
-        var div = $("#player" + (i-1)+" .name"+" .turnNumber");
-        if (i <= 4){
-            $("<img src='images/icons/player" + i + ".png'>").appendTo(div);
-            playing.push(i-1);
-        } else {
-            div.text(i-4 +".");
-            que.push(i-1);
-        }
+
+function updateQue(){
+    for (i = 0; i < playing.length; i++) {
+        var div = $("#player" + (playing[i])+" .name"+" .turnNumber");
+        div.html( $("<img src='images/icons/player" + (i + 1) + ".png'>"));
     }
+    for (i = 0; i < que.length; i++) {
+        div = $("#player" + (que[i])+" .name"+" .turnNumber");
+        div.text((i + 1) +".");
+    }
+}
+
+function random()
+{
+
+    m_z = (36969 * (m_z & 65535) + (m_z >> 16)) & mask;
+    m_w = (18000 * (m_w & 65535) + (m_w >> 16)) & mask;
+    var result = ((m_z << 16) + m_w) & mask;
+    result /= 4294967296;
+    return result + 0.5;
+}
+
+var m_w = 123446366789;
+var m_z = 987654321;
+var mask = 0xffffffff;
+
+function randomMapList() {
+    for (i = 0; i < rounds * players.length; i++) {
+        var map = Math.floor(random() * 16);
+        if (mapList.length > 0) {
+            while (map == mapList[mapList.length - 1]) {
+                map = Math.floor(random() * 16);
+            }
+        }
+        mapList.push(map);
+    }
+}
+
+function flashMap() {
+    $("#map"+mapList[mapNumber]).children().first().toggleClass("highlight");
+    setTimeout(flashMap, 700)
+}
+
+function getMap() {
+    $(".mapImage").addClass("highlight");
+    $("#map"+mapList[mapNumber]).children().first().removeClass("highlight");
+}
+function updateMapCount(value) {
+    mapCount[mapList[mapNumber]] += value;
+    $("#mapCount" + mapList[mapNumber]).text(mapCount[mapList[mapNumber]]);
+    writeCookie();
+
 }
 
 function animateEngine(){
@@ -200,14 +257,27 @@ function animateDrive(){
     setTimeout(animateDrive, 30);
 }
 
+function resetSize() {
+    $("#container").height($(window).height() - ($("#top").height()*2));
+    $(".numberSlot").css("line-height", $(".playerSlot").height() + "px").height($(window).height() - ($("#top").height() *2));
+    $(".playerSlot").height($("#container").height() / (players.length + 1.1));
+    for (i = 0; i < players.length; i++) {
+        $("#playerImage" + i).css({
+            'right':'-' + ($(".numberSlot").width() * (1 + players[i][2]) - 5) + 'px',
+            'left': 'auto'
+        });
+    }
+}
+
 $(document).ready(function () {
     readParameters();
-    setOrder();
+    m_w = seed;
+    randomMapList();
 
 
 
     for (i = 0; i < maps.length; i++) {
-        map = $('<div class="map"><img class="mapImage" src="images/maps/' + maps[i] + '.png"><div class="mapCount">0</div></div>');
+        map = $('<div class="map" id="map'+  i + '"><img class="mapImage" src="images/maps/' + maps[i] + '.png"/><div id="mapCount'+  i + '" class="mapCount">' + mapCount[i] + '</div></div>');
         cup = "#cup" + (Math.floor(i / 4) + 1);
         map.appendTo($(cup));
     }
@@ -230,7 +300,7 @@ $(document).ready(function () {
         number = $('<div class=numberSlot style="background-color: ' + color + '; width: ' + 100/(rounds+1) +'%">' + i + '</div>');
         number.appendTo($("#marker"));
     }
-    number = $('<div class=numberSlot style="background-color: rgba(199,76,0,0.65); width: ' + 100/(rounds+1) +'%"><img src="images/icons/lastLap.png"></div>');
+    number = $('<div class=numberSlot style="background-color: rgba(204,194,0,0.65); width: ' + 100/(rounds+1) +'%"><img src="images/icons/lastLap.png"></div>');
     number.appendTo($("#marker"));
 
 
@@ -243,36 +313,41 @@ $(document).ready(function () {
 
     updateQue();
 
-    /*
-    $(".playerSlot").click( function () {
-        var id = parseInt(($(this).attr('id').replace("player", "")));
-        if (playing.indexOf(id) != -1){
-            players[id][2] += 1;
-            $("#playerImage" + id).css({
-                'right':'-' + ($(".numberSlot").width() * (1 + players[id][2]) - 5) + 'px',
-                'left': 'auto'
-            });
-            var temp = playing[playing.indexOf(id)];
-            playing[playing.indexOf(id)] = que[0];
-            lastPlayer.push(que[0]);
-            que.splice(0,1);
-            que.push(temp);
-            updateQue();
-        }
 
+    $(".map").click( function () {
+        if (!betterRandom) {
+            var id = parseInt(($(this).attr('id').replace("map", "")));
+            mapCount[id] += 1;
+            $("#mapCount" + id).text(mapCount[id]);
+            writeCookie();
+        }
     });
-    */
+
 
     document.addEventListener('keydown', function(event) {
         if( event.keyCode >= 48 && event.keyCode <= 57 ) {
             var id = event.keyCode - 49;
             if (id < 0){ id = 9}
-            playerMove(id);
-            writeCookie();
+            if (playing.indexOf(id) != -1) {
+                playerMove(id);
+                if (betterRandom) {
+                    mapNumber += 1;
+                    updateMapCount(1);
+                    getMap();
+                }
+                writeCookie();
+            }
         }
         if ( event.keyCode == 8 ){
-            undoMove();
-            writeCookie();
+            if (lastPlayer.length > 0) {
+                undoMove();
+                if (betterRandom) {
+                    updateMapCount(-1);
+                    mapNumber -= 1;
+                    getMap();
+                }
+                writeCookie();
+            }
 
         }
         if (event.keyCode == 46){
@@ -282,21 +357,18 @@ $(document).ready(function () {
         }
 
     });
-
+    if (betterRandom) {
+        getMap();
+        flashMap();
+    }
     animateEngine();
     animateDrive();
+    checkJonne();
+
 
     $(window).resize(function () {
-        $("#container").height($(window).height() - ($("#top").height() + $("#bottom").height()));
-        $(".numberSlot").css("line-height", $(".playerSlot").height() + "px").height($(window).height() - ($("#top").height() + $("#bottom").height()));
-        $(".playerSlot").height($("#container").height() / (players.length + 1.1));
-        for (i = 0; i < players.length; i++) {
-            $("#playerImage" + i).css({
-                'right':'-' + ($(".numberSlot").width() * (1 + players[i][2]) - 5) + 'px',
-                'left': 'auto'
-            });
-        }
+        resetSize();
     });
 
-
+    resetSize();
 });
