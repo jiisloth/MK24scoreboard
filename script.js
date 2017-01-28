@@ -50,9 +50,15 @@ function checkJonne() {
 
     if (count >= playing.length){
         var sofa = playing.slice(0);
-        for (i = lastPlayer.length-1; i >= 0; i--){
-            if (sofa.indexOf(lastPlayer[i]) != -1){
-                sofa.splice(sofa.indexOf(lastPlayer[i]), 1);
+        var lastPlayerCopy = lastPlayer.slice(0);
+        for (i = lastPlayerCopy.length-1; i >= 0; i--){
+            if (typeof lastPlayerCopy[i] === "string") {
+                lastPlayerCopy[i] = parseInt(lastPlayerCopy[i].split(":")[1]);
+            }
+        }
+        for (i = lastPlayerCopy.length-1; i >= 0; i--){
+            if (sofa.indexOf(lastPlayerCopy[i]) != -1){
+                sofa.splice(sofa.indexOf(lastPlayerCopy[i]), 1);
                 if (sofa.length == 1) {
                     jonne = sofa[0];
                 }
@@ -60,7 +66,7 @@ function checkJonne() {
         }
     }
     if (count < playing.length - 1 && count >= 0){
-        jonne = "none"
+        jonne = "none";
         $(".playerImage").removeClass("jonne");
     }
     if (jonne != "none"){
