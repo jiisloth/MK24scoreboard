@@ -6,6 +6,7 @@ var icons = ["mario", "luigi", "bowser", "peach", "daisy", "yoshi", "toad", "toa
 
 var players = [];
 var playerCount = 0;
+var controllers = 0;
 var iconChoice = "";
 
 var betterRandom;
@@ -53,7 +54,7 @@ function nextPlayer() {
         initNextPlayer();
         if (players.length >= playerCount) {
             players = shuffle(players);
-            window.location.href = "scoreboard.html?players=" + encodeURI(players) + "&rounds=" + rounds + "&betterRandom=" + betterRandom + "&seed=" + Math.floor(Math.random() * 100000) + "&mapNumber=" + 0;
+            window.location.href = "scoreboard.html?players=" + encodeURI(players) + "&rounds=" + rounds + "&controllers=" + controllers + "&betterRandom=" + betterRandom + "&seed=" + Math.floor(Math.random() * 100000) + "&mapNumber=" + 0;
 
         }
 
@@ -66,6 +67,7 @@ $(document).ready(function () {
     $("#getGameSettings").click( function () {
         rounds = parseInt($("#roundInput").val());
         playerCount = $("#playerInput").val();
+        controllers = $("#controllerInput").val();
         betterRandom = $("#betterRandom").is(':checked');
         $("#gameSettings").hide();
         $("#playerSettings").show();

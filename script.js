@@ -10,7 +10,7 @@ var betterRandom;
 var seed;
 var mapNumber;
 
-
+var controllers = 0;
 var players = [];
 
 var mapList = [];
@@ -120,9 +120,9 @@ function writeCookie() {
     var now = new Date();
     now.setMonth(now.getMonth() + 1);
     if (lastPlayer.length > 0) {
-        document.cookie = "?players=" + encodeURI(players) + "&rounds=" + rounds +  "&betterRandom=" + betterRandom + "&seed=" + seed + "&mapNumber=" + mapNumber + "&lastPlayer=" + lastPlayer + "&playing=" + playing + "&que=" + que + "&mapCount=" + mapCount + ";expires=" + now.toUTCString() + ";";
+        document.cookie = "?players=" + encodeURI(players) + "&rounds=" + rounds + "&controllers=" + controllers + "&betterRandom=" + betterRandom + "&seed=" + seed + "&mapNumber=" + mapNumber + "&lastPlayer=" + lastPlayer + "&playing=" + playing + "&que=" + que + "&mapCount=" + mapCount + ";expires=" + now.toUTCString() + ";";
     } else {
-        document.cookie = "?players=" + encodeURI(players) + "&rounds=" + rounds +  "&betterRandom=" + betterRandom + "&seed=" + seed + "&mapNumber=" + mapNumber + ";expires=" + now.toUTCString() + ";";
+        document.cookie = "?players=" + encodeURI(players) + "&rounds=" + rounds + "&controllers=" + controllers + "&betterRandom=" + betterRandom + "&seed=" + seed + "&mapNumber=" + mapNumber + ";expires=" + now.toUTCString() + ";";
     }
 }
 
@@ -138,29 +138,30 @@ function readParameters(){
     }
     params = params.substring(1).split("&");
 
-    if (params.length > 5) {
-        lastPlayer = params[5].split("=")[1].split(",");
+    if (params.length > 6) {
+        lastPlayer = params[6].split("=")[1].split(",");
         for (i = 0; i < lastPlayer.length; i++) {
             if (!isNaN(lastPlayer[i])) {
                 lastPlayer[i] = parseInt(lastPlayer[i])
             }
         }
-        playing = params[6].split("=")[1].split(",");
+        playing = params[7].split("=")[1].split(",");
         for (i = 0; i < playing.length; i++) {
             playing[i] = parseInt(playing[i])
         }
-        que = params[7].split("=")[1].split(",");
+        que = params[8].split("=")[1].split(",");
         for (i = 0; i < que.length; i++) {
             que[i] = parseInt(que[i])
         }
-        mapCount = params[8].split("=")[1].split(",");
+        mapCount = params[9].split("=")[1].split(",");
         for (i = 0; i < mapCount.length; i++) {
             mapCount[i] = parseInt(mapCount[i])
         }
     }
-    betterRandom = (params[2].split("=")[1] == "true");
-    seed = parseInt(params[3].split("=")[1]);
-    mapNumber = parseInt(params[4].split("=")[1]);
+    betterRandom = (params[3].split("=")[1] == "true");
+    seed = parseInt(params[4].split("=")[1]);
+    mapNumber = parseInt(params[5].split("=")[1]);
+    controllers = parseInt(params[2].split("=")[1]);
     rounds = parseInt(params[1].split("=")[1]);
     params = decodeURI(params[0].split("=")[1]).split(",");
     var player = [];
@@ -279,6 +280,8 @@ $(document).ready(function () {
     readParameters();
     m_w = seed;
     randomMapList();
+
+    createQue();
 
 
 
