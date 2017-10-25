@@ -21,7 +21,7 @@ var que = [];
 
 var jonne = "none";
 
-var rounds = 24;
+var rounds = 0;
 
 var i;
 var lastPlayer = [];
@@ -254,7 +254,7 @@ var m_z = 987654321;
 var mask = 0xffffffff;
 
 function randomMapList() {
-    for (i = 0; i < rounds * players.length; i++) {
+    for (i = 0; i < rounds * players.length*2; i++) {
         var map = Math.floor(random() * 16);
         if (mapList.length > 0) {
             while (map == mapList[mapList.length - 1]) {
@@ -436,6 +436,7 @@ $(document).ready(function () {
     });
 
     if (betterRandom) {
+        updateMapCount(1);
         getMap();
         flashMap();
     }
