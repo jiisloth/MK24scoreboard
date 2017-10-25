@@ -5,6 +5,7 @@
 
 var maps = ["LuigiCircuit", "PeachBeach", "BabyPark", "DryDryDesert", "MushroomBridge", "MarioCircuit", "DaisyCruiser", "WaluigiStadium", "SherbetLand", "MushroomCity", "YoshiCircuit", "DKMountain", "WarioColosseum", "DinoDinoJungle", "BowserCastle", "RainbowRoad"];
 var mapCount = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+var keyCodeIds = {49:0, 50:1, 51:2, 52:3, 53:4, 54:5, 55:6, 56:7, 57:8, 48:9, 81:10, 87:11, 69:12, 82:13, 84:14, 89:15, 85:16, 73:17, 79:18, 80:19};
 
 var betterRandom;
 var seed;
@@ -15,8 +16,8 @@ var players = [];
 
 var mapList = [];
 
-var playing = [0,1,2,3];
-var que = [4,5,6,7,8,9];
+var playing = [];
+var que = [];
 
 var jonne = "none";
 
@@ -24,6 +25,8 @@ var rounds = 24;
 
 var i;
 var lastPlayer = [];
+
+var shift = false;
 
 
 function playerMove(id) {
@@ -80,11 +83,19 @@ function checkJonne() {
 function undoMove() {
     var lastOne = lastPlayer.pop();
     if (typeof lastOne === "string"){
-        lastOne = parseInt(lastOne.split(":")[1]);
-        var errorOne = que.pop();
-        playing[playing.indexOf(lastOne)] = errorOne;
-        que.unshift(lastOne);
-        lastPlayer.push(errorOne);
+        if (lastOne.split(":")[0] === "<-ss"){
+            lastOne = parseInt(lastOne.split(":")[1]);
+            var errorOne = que.pop();
+            playing[playing.indexOf(lastOne)] = errorOne;
+            que.unshift(lastOne);
+            // lastPlayer.push(errorOne);
+        } else {
+            lastOne = parseInt(lastOne.split(":")[1]);
+            var errorOne = que.pop();
+            playing[playing.indexOf(lastOne)] = errorOne;
+            que.unshift(lastOne);
+            lastPlayer.push(errorOne);
+        }
 
     } else {
         var errorOne = que.pop();
@@ -95,22 +106,62 @@ function undoMove() {
             'right': '-' + ($(".numberSlot").width() * (1 + players[errorOne][2]) - 5) + 'px',
             'left': 'auto'
         });
+        if (betterRandom) {
+            updateMapCount(-1);
+            mapNumber -= 1;
+            getMap();
+        }
     }
+    console.log(lastPlayer);
     checkJonne();
     updateQue();
 
 }
 
+function superskip() {
+    var skip = prompt("Skip controller number:", "");
+
+    if (skip == null || skip == "") {
+        return
+    } else if (0 < skip && skip <= controllers ){
+        lastOne = playing[skip-1]
+        var temp = playing[playing.indexOf(lastOne)];
+        playing[playing.indexOf(lastOne)] = que[0];
+        lastPlayer.push("<-ss:"+que[0]);
+        que.splice(0,1);
+        que.push(temp);
+        console.log(lastPlayer);
+        checkJonne();
+        updateQue();
+        return
+    }
+
+    superskip()
+}
+
+
 function skippy() {
-    var lastOne = lastPlayer.pop();
-    if (typeof lastOne === "string") {
-        lastOne = parseInt(lastOne.split(":")[1]);
+    var lastOne;
+    if (typeof lastPlayer[lastPlayer.length-1] === "string") {
+        console.log(lastPlayer[lastPlayer.length-1].split(":")[0])
+        if (lastPlayer[lastPlayer.length-1].split(":")[0] === "<-ss"){
+            superskip();
+            return
+        }
+        lastOne = parseInt(lastPlayer[lastPlayer.length-1].split(":")[1]);
+    } else if (typeof lastPlayer[lastPlayer.length-1] === "number"){
+        lastOne = lastPlayer.pop();
+        console.log(lastOne)
+    } else {
+        lastOne = superskip();
+        return
     }
     var temp = playing[playing.indexOf(lastOne)];
     playing[playing.indexOf(lastOne)] = que[0];
     lastPlayer.push("<-s:"+que[0]);
     que.splice(0,1);
     que.push(temp);
+    console.log(lastPlayer);
     checkJonne();
     updateQue();
 }
@@ -137,7 +188,7 @@ function readParameters(){
         }
     }
     params = params.substring(1).split("&");
-
+    console.log(params)
     if (params.length > 6) {
         lastPlayer = params[6].split("=")[1].split(",");
         for (i = 0; i < lastPlayer.length; i++) {
@@ -276,14 +327,26 @@ function resetSize() {
     }
 }
 
+
+function createQue() {
+    var i;
+    for (i = 0; i < controllers; i ++){
+        playing.push(i)
+    }
+    for (i = controllers; i < players.length; i ++){
+        que.push(i)
+    }
+}
+
+
 $(document).ready(function () {
     readParameters();
     m_w = seed;
     randomMapList();
 
-    createQue();
-
-
+    if (playing.length == 0){
+        createQue();
+    }
 
     for (i = 0; i < maps.length; i++) {
         map = $('<div class="map" id="map'+  i + '"><img class="mapImage" src="images/maps/' + maps[i] + '.png"/><div id="mapCount'+  i + '" class="mapCount">' + mapCount[i] + '</div></div>');
@@ -334,38 +397,49 @@ $(document).ready(function () {
 
 
     document.addEventListener('keydown', function(event) {
-        if( event.keyCode >= 48 && event.keyCode <= 57 ) {
-            var id = event.keyCode - 49;
-            if (id < 0){ id = 9}
-            if (playing.indexOf(id) != -1) {
-                playerMove(id);
-                if (betterRandom) {
-                    mapNumber += 1;
-                    updateMapCount(1);
-                    getMap();
+        if( keyCodeIds.hasOwnProperty(event.keyCode)) {
+            var id = keyCodeIds[event.keyCode];
+            if (id < players.length) {
+                if (playing.indexOf(id) != -1) {
+                    playerMove(id);
+                    if (betterRandom) {
+                        mapNumber += 1;
+                        updateMapCount(1);
+                        getMap();
+                    }
+                    writeCookie();
                 }
-                writeCookie();
             }
         }
         if ( event.keyCode == 8 ){
             if (lastPlayer.length > 0) {
                 undoMove();
-                if (betterRandom) {
-                    updateMapCount(-1);
-                    mapNumber -= 1;
-                    getMap();
-                }
                 writeCookie();
             }
 
         }
+        if (event.keyCode == 16){
+            shift = true
+        }
         if (event.keyCode == 46){
-            skippy();
+            if (shift){
+                shift = false;
+                superskip();
+            }
+            else {
+                skippy();
+            }
             writeCookie();
 
         }
 
     });
+    document.addEventListener('keyup', function(event) {
+        if (event.keyCode == 16){
+            shift = false
+        }
+    });
+
     if (betterRandom) {
         getMap();
         flashMap();
