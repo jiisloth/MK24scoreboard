@@ -81,24 +81,25 @@ function checkJonne() {
 
 
 function undoMove() {
+    var errorOne;
     var lastOne = lastPlayer.pop();
     if (typeof lastOne === "string"){
         if (lastOne.split(":")[0] === "<-ss"){
             lastOne = parseInt(lastOne.split(":")[1]);
-            var errorOne = que.pop();
+            errorOne = que.pop();
             playing[playing.indexOf(lastOne)] = errorOne;
             que.unshift(lastOne);
             // lastPlayer.push(errorOne);
         } else {
             lastOne = parseInt(lastOne.split(":")[1]);
-            var errorOne = que.pop();
+            errorOne = que.pop();
             playing[playing.indexOf(lastOne)] = errorOne;
             que.unshift(lastOne);
             lastPlayer.push(errorOne);
         }
 
     } else {
-        var errorOne = que.pop();
+        errorOne = que.pop();
         playing[playing.indexOf(lastOne)] = errorOne;
         que.unshift(lastOne);
         players[errorOne][2] -= 1;
@@ -112,7 +113,6 @@ function undoMove() {
             getMap();
         }
     }
-    console.log(lastPlayer);
     checkJonne();
     updateQue();
 
@@ -124,13 +124,12 @@ function superskip() {
     if (skip == null || skip == "") {
         return
     } else if (0 < skip && skip <= controllers ){
-        lastOne = playing[skip-1]
+        lastOne = playing[skip-1];
         var temp = playing[playing.indexOf(lastOne)];
         playing[playing.indexOf(lastOne)] = que[0];
         lastPlayer.push("<-ss:"+que[0]);
         que.splice(0,1);
         que.push(temp);
-        console.log(lastPlayer);
         checkJonne();
         updateQue();
         return
@@ -143,7 +142,6 @@ function superskip() {
 function skippy() {
     var lastOne;
     if (typeof lastPlayer[lastPlayer.length-1] === "string") {
-        console.log(lastPlayer[lastPlayer.length-1].split(":")[0])
         if (lastPlayer[lastPlayer.length-1].split(":")[0] === "<-ss"){
             superskip();
             return
@@ -151,7 +149,6 @@ function skippy() {
         lastOne = parseInt(lastPlayer[lastPlayer.length-1].split(":")[1]);
     } else if (typeof lastPlayer[lastPlayer.length-1] === "number"){
         lastOne = lastPlayer.pop();
-        console.log(lastOne)
     } else {
         lastOne = superskip();
         return
@@ -161,7 +158,6 @@ function skippy() {
     lastPlayer.push("<-s:"+que[0]);
     que.splice(0,1);
     que.push(temp);
-    console.log(lastPlayer);
     checkJonne();
     updateQue();
 }
@@ -188,7 +184,6 @@ function readParameters(){
         }
     }
     params = params.substring(1).split("&");
-    console.log(params)
     if (params.length > 6) {
         lastPlayer = params[6].split("=")[1].split(",");
         for (i = 0; i < lastPlayer.length; i++) {
