@@ -352,7 +352,7 @@ $(document).ready(function () {
 
 
     for (i = 0; i < players.length; i++) {
-        playerslot = $('<div id="player' + i + '" class="playerSlot"><div class="name"><div class="turnNumber"></div>' + players[i][0] + '</div><div id="score' + i + '" class="score"><div class="playerImageHolder"><img id="playerImage' + i + '" class="playerImage" src="images/playerIcons/' + players[i][1] + '.png"></div></div></div>')
+        playerslot = $('<div id="player' + i + '" class="playerSlot"><div class="name"><div class="turnNumber"></div>' + decodeURI(players[i][0]) + '</div><div id="score' + i + '" class="score"><div class="playerImageHolder"><img id="playerImage' + i + '" class="playerImage" src="images/playerIcons/' + players[i][1] + '.png"></div></div></div>')
         playerslot.appendTo($("#container"));
     }
 
@@ -367,7 +367,7 @@ $(document).ready(function () {
         number = $('<div class=numberSlot style="background-color: ' + color + '; width: ' + 100/(rounds+1) +'%">' + i + '</div>');
         number.appendTo($("#marker"));
     }
-    number = $('<div class=numberSlot style="background-color: rgba(204,194,0,0.65); width: ' + 100/(rounds+1) +'%"><img src="images/icons/lastLap.png"></div>');
+    number = $('<div class=numberSlot style="background-color: rgba(204,194,0,0.65); width: ' + 100/(rounds+1) +'%"><img class="helpOPEN" src="images/icons/lastLap.png"></div>');
     number.appendTo($("#marker"));
 
 
@@ -390,8 +390,15 @@ $(document).ready(function () {
         }
     });
 
+    $(".helpOPEN").click( function () {
+        $("#help").show()
+    });
+    $("#helpOK").click( function () {
+        $("#help").hide()
+    });
 
     document.addEventListener('keydown', function(event) {
+        $("#help").hide()
         if( keyCodeIds.hasOwnProperty(event.keyCode)) {
             var id = keyCodeIds[event.keyCode];
             if (id < players.length) {
@@ -450,4 +457,5 @@ $(document).ready(function () {
     });
 
     resetSize();
+    setTimeout(resetSize, 500)
 });

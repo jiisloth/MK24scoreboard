@@ -32,7 +32,7 @@ body{
 }
 
 #scoreboard{
-
+    position: absolute;
 }
 
 .cupHolder{
@@ -134,4 +134,50 @@ body{
 
 .highlight{
     opacity: 0.4;
+}
+
+#help {
+    width: 340px;
+    height: 280px;
+    background-color: #c9c9c9;
+
+    position:absolute; /*it can be fixed too*/
+    padding: 10px;
+    left:0; right:0;
+    top:0; bottom:0;
+    margin:auto;
+
+    /*this to solve "the content will not be cut when the window is smaller than the content": */
+    max-width:100%;
+    max-height:100%;
+    overflow:auto;
+    border: 2px solid black;
+}
+#help > .center{
+    text-align: center;
+}
+
+.right{
+    float: right;
+}
+.left{
+    float: left;
+}
+
+.clear{
+    clear: both;
+}
+
+#helpOK {
+    background-color: #b0b0b0;
+    padding: 4px;
+    border: 1px solid black;
+    text-align: center;
+    width: 60px;
+    margin: auto;
+    cursor: pointer;
+}
+
+.helpOPEN{
+    cursor: pointer;
 }

@@ -50,7 +50,7 @@ function nextPlayer() {
     }
 
     if (iconChoice != "" && $("#nameInput").val() != "") {
-        var player = [$("#nameInput").val(), iconChoice, 0];
+        var player = [encodeURI($("#nameInput").val().replace(",", "")), iconChoice, 0];
         $("#" + iconChoice + "Button").remove();
 
         players.push(player);
