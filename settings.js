@@ -2,7 +2,7 @@
  * Created by lapsloth on 25.1.2017.
  */
 
-var icons = ["mario", "luigi", "bowser", "peach", "daisy", "yoshi", "toad", "toadette", "donkeykong", "boo", "koopa", "klunk", "chuck", "link", "chiken", "bubble", "mage", "pikachu", "samus", "sonic"]
+var icons = ["mario", "luigi", "bowser", "peach", "daisy", "yoshi", "toad", "toadette", "donkeykong", "boo", "koopa", "klunk", "chuck", "link", "chiken", "bubble", "mage", "pikachu", "samus", "sonic", "bowsette", "bowsette2"]
 
 var players = [];
 var playerCount = 0;
@@ -47,6 +47,9 @@ function nextPlayer() {
     }
     if (iconChoice == "" && $("#nameInput").val() == "Mega_Tron") {
         iconChoice = "megaman";
+    }
+    if (iconChoice == "" && $("#nameInput").val() == "Ssarste") {
+        iconChoice = "barret";
     }
 
     if (iconChoice != "" && $("#nameInput").val() != "") {
