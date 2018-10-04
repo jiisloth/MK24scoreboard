@@ -390,6 +390,16 @@ $(document).ready(function () {
         }
     });
 
+    $(".map").contextmenu( function (e) {
+        e.preventDefault();
+        if (!betterRandom) {
+            var id = parseInt(($(this).attr('id').replace("map", "")));
+            mapCount[id] -= 1;
+            $("#mapCount" + id).text(mapCount[id]);
+            writeCookie();
+        }
+    });
+
     $(".helpOPEN").click( function () {
         $("#help").show()
     });
