@@ -48,7 +48,7 @@ function nextPlayer() {
     if (iconChoice == "" && $("#nameInput").val() == "Mega_Tron") {
         iconChoice = "megaman";
     }
-    if (iconChoice == "" && $("#nameInput").val() == "Ssarste") {
+    if (iconChoice == "" && $("#nameInput").val() == "ssarste") {
         iconChoice = "barret";
     }
 
