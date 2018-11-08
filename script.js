@@ -237,6 +237,9 @@ function updateQue(){
         div = $("#player" + (que[i])+" .name"+" .turnNumber");
         div.text((i + 1) +".");
     }
+    for (i = 0; i < players.length; i++) {
+        $("#info-score" + i ).text(players[i][2])
+    }
 }
 
 function random()
@@ -352,7 +355,19 @@ $(document).ready(function () {
 
 
     for (i = 0; i < players.length; i++) {
-        playerslot = $('<div id="player' + i + '" class="playerSlot"><div class="name"><div class="turnNumber"></div>' + decodeURI(players[i][0]) + '</div><div id="score' + i + '" class="score"><div class="playerImageHolder"><img id="playerImage' + i + '" class="playerImage" src="images/playerIcons/' + players[i][1] + '.png"></div></div></div>')
+        playerslot = $('<div id="player' + i + '" class="playerSlot">' +
+            '<div class="name">' +
+            '<div class="turnNumber"></div>' +
+            '<img class="mini-p-img" src="images/playerIcons/' + players[i][1] + '.png">' +
+            '<div class="info">' +
+            '<div>' + decodeURI(players[i][0]) + '</div>' +
+            '<div class="info-score">' +
+            '<img src="images/icons/beer.png">' +
+            'x<div id="info-score' + i + '" class="info">0</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div id="score' + i + '" class="score"><div class="playerImageHolder"><img id="playerImage' + i + '" class="playerImage" src="images/playerIcons/' + players[i][1] + '.png"></div></div></div>')
         playerslot.appendTo($("#container"));
     }
 

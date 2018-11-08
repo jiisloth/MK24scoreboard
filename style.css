@@ -59,7 +59,7 @@ body{
     overflow: hidden;
 }
 #marker{
-    margin-left: 200px;
+    margin-left: 270px;
     height: 100px;
     display: flex;
     justify-content: space-around;
@@ -77,15 +77,14 @@ body{
     display: inline-block;
     vertical-align: middle;
     width: 50px;
-    margin-right: 20px;
     text-align: center;
     margin-top: -10px;
     margin-bottom: -10px;
 }
 .name{
-    font-size: 25px;
-    width: 200px;
-    max-width: 200px;
+    font-size: 32px;
+    width: 270px;
+    max-width: 270px;
     padding-left: 20px;
     display: table-cell;
     vertical-align: middle;
@@ -187,4 +186,20 @@ body{
 
 .helpOPEN{
     cursor: pointer;
+}
+
+.mini-p-img{
+    width: 48px;
+        display: inline-block;
+    vertical-align: middle;
+}
+
+.info{
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: -2px;
+    margin-bottom: -2px;
+}
+.info-score{
+    font-size: 22px;
 }
