@@ -2,41 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
     <script src="jquery-3.1.1.js"></script>
     <script src="settings.js"></script>
     <title></title>
 </head>
 <body>
 <div id="settings">
-    <div id="gameSettings">
-        <h2>Settings</h2>
-        <label for="roundInput">How many rounds?</label>
-        <br>
-        <input id="roundInput" type="number" min="1" value="24"/>
-        <br>
-        <label for="playerInput">How many players?</label>
-        <br>
-        <input id="playerInput" type="number" min="6" value="10" max="20"/>
-        <br>
-        <label for="controllerInput">How many controllers?</label>
-        <br>
-        <input id="controllerInput" type="number" min="2" max="4" value="4"/>
-        <br>
-        <label for="betterRandom">"Better" random: </label><input id="betterRandom" type="checkbox">
-        <br>
-        <input id="getGameSettings" type="button" value="Next">
-    </div>
-    <div id="playerSettings">
-        <h2>Players:</h2>
-        <label for="nameInput">Name:</label>
-        <br>
-        <input id="nameInput" type="text"/>
-        <br>
-        <div id="iconHolder">
-
+    <div id="menu">
+        <div id="start_menu" class="menu_tab">
+            <div id="new_game" class="menu_link">New Game</div>
+            <div id="load_cookie" class="menu_link">Load From Cookies</div>
+            <div id="load_file" class="menu_link">Load From File</div>
         </div>
-        <input id="getPlayerSettings" type="button" value="Next">
+        <div id="game_menu" class="menu_tab">
+            <label for="input_rounds">Rounds: </label><input id="input_rounds" type="number" min="1" value="24"/>
+            <label for="input_players">Players: </label><input id="input_players" type="number" min="1" value="10"/>
+            <label for="input_controllers">Controllers: </label><input id="input_controllers" type="number" min="1" max="8" value="4"/>
+            <div class="two_button_row">
+                <div id="game_menu_back" class="menu_link">
+                    Back
+                </div><
+                <div id="game_menu_next" class="menu_link">
+                    Next
+                </div>
+            </div>
+        </div>
+        <div id="player_menu" class="menu_tab">
+            <div id="player_icons">
+                Could not find player icons
+            </div>
+            <div class="two_button_row">
+                <div>
+                    <label for="input_nick">Nick: </label><input id="input_nick" type="text"/>
+                </div>
+                <div>
+                    i / players
+                </div>
+            </div>
+            <div class="two_button_row">
+                <div id="players_menu_back" class="menu_link">
+                    Back
+                </div><
+                <div id="players_menu_next" class="menu_link">
+                    Next
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

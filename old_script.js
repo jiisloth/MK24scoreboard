@@ -180,7 +180,7 @@ function readParameters(){
         paramsFromUrl = "no";
         params = document.cookie;
         if (!params){
-            window.location.href = "index.html";
+            window.location.href = "old_index.html";
         }
     }
     params = params.substring(1).split("&");
@@ -221,7 +221,7 @@ function readParameters(){
     }
     if (paramsFromUrl == "yes") {
         writeCookie();
-        window.location.href = "scoreboard.html";
+        window.location.href = "old_scoreboard.html";
     }
 
 }

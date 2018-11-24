@@ -1,0 +1,14 @@
+@font-face {
+    font-family: "My Custom Font";
+    src: url(font/CyberSloth.ttf) format("truetype");
+}
+
+body, html{
+    background-color: #3a3191;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: "My Custom Font", sans-serif, Tahoma;
+    padding: 0;
+    overflow: hidden;
+}
