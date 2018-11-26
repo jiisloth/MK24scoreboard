@@ -11,43 +11,73 @@
 <div id="settings">
     <div id="menu">
         <div id="start_menu" class="menu_tab">
-            <div id="new_game" class="menu_link">New Game</div>
-            <div id="load_cookie" class="menu_link">Load From Cookies</div>
-            <div id="load_file" class="menu_link">Load From File</div>
+            <div class="menu_items">
+                <div class="menu_single">
+                <div id="new_game" class="menu_link menu_item">New Game</div>
+                </div>
+                <div class="menu_single">
+                    <div id="load_cookies" class="menu_link menu_item disabled">Load From Cookies</div>
+                </div>
+                <div class="menu_single">
+                    <div id="load_file" class="menu_link menu_item disabled">Load From File</div>
+                </div>
+            </div>
         </div>
         <div id="game_menu" class="menu_tab">
-            <label for="input_rounds">Rounds: </label><input id="input_rounds" type="number" min="1" value="24"/>
-            <label for="input_players">Players: </label><input id="input_players" type="number" min="1" value="10"/>
-            <label for="input_controllers">Controllers: </label><input id="input_controllers" type="number" min="1" max="8" value="4"/>
-            <div class="two_button_row">
-                <div id="game_menu_back" class="menu_link">
-                    Back
-                </div><
-                <div id="game_menu_next" class="menu_link">
-                    Next
+            <div class="menu_items">
+                <div class="menu_row">
+                    <label for="input_rounds">Rounds: </label>
+                    <input id="input_rounds" class="menu_item" type="number" min="1" max="99" value="24"/>
+                </div>
+                <div class="menu_row">
+                    <label for="input_players">Players: </label>
+                    <input id="input_players" class="menu_item" type="number" min="1" max="99" value="10"/>
+                </div>
+                <div class="menu_row">
+                    <label for="input_controllers">Controllers: </label>
+                    <input id="input_controllers" class="menu_item" type="number" min="1" max="8" value="4"/>
+                </div>
+                <div class="menu_row">
+                    <label for="input_shuffle">Shuffle players: </label>
+                    <div id="input_shuffle" class="menu_link menu_item">TRUE</div>
+                </div>
+                <div class="menu_row">
+                    <div id="game_menu_back" class="menu_link menu_item">
+                        Back
+                    </div>
+                    <div id="game_menu_next" class="menu_link menu_item">
+                        Next
+                    </div>
                 </div>
             </div>
         </div>
         <div id="player_menu" class="menu_tab">
-            <div id="player_icons">
-                Could not find player icons
-            </div>
-            <div class="two_button_row">
-                <div>
-                    <label for="input_nick">Nick: </label><input id="input_nick" type="text"/>
+            <div class="menu_items">
+                <div id="player_icons">
+                    Could not find player icons
                 </div>
-                <div>
-                    i / players
+                <div class="menu_row">
+                    <div>
+                        <label for="input_nick">Nick: </label><input id="input_nick" class="menu_item" type="text"/>
+                    </div>
+                    <div id="player_count">
+                        i / players
+                    </div>
+                </div>
+                <div class="menu_row">
+                    <div id="player_menu_back" class="menu_link menu_item">
+                        Back
+                    </div>
+                    <div id="player_menu_next" class="menu_link menu_item disabled">
+                        Next
+                    </div>
                 </div>
             </div>
-            <div class="two_button_row">
-                <div id="players_menu_back" class="menu_link">
-                    Back
-                </div><
-                <div id="players_menu_next" class="menu_link">
-                    Next
-                </div>
-            </div>
+        </div>
+    </div>
+    <div id="filler">
+        <div id="player_iicons">
+            <div id="icon_mage" class="icon menu_item gone selected"><img src="images/playerIcons/mage.png"><div class="icon_text">TESTNICK</div></div>
         </div>
     </div>
 </div>
