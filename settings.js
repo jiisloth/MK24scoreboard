@@ -90,7 +90,7 @@ $(document).ready(function () {
             button_holder = 0;
             let current = $('#' + current_menu[current_link_row][current_link_col]);
             if (current.attr('type') === 'number') {
-                e.preventDefault()
+                e.preventDefault();
                 current.val('0');
             }
 
@@ -110,6 +110,9 @@ $(document).ready(function () {
 
     $('#new_game').click(function () {
         update_tab($('#game_menu'), game_menu)
+    });
+    $('#load_cookies').click(function () {
+        window.location.href = 'scoreboard.html?load=cookie'
     });
     $('#input_shuffle').click(function () {
         let shuffle = $('#input_shuffle');
@@ -151,6 +154,9 @@ $(document).ready(function () {
             if (current === 'new_game') {
                 update_tab($('#game_menu'), game_menu)
             }
+            if (current === 'load_cookie') {
+                window.location.href = 'scoreboard.html?load=cookie'
+            }
             if (current === 'input_shuffle') {
                 let shuffle = $('#input_shuffle');
                 if (shuffle.html() === "TRUE"){
@@ -188,7 +194,11 @@ $(document).ready(function () {
     });
     function remove_player() {
         const player = players.pop();
-        $('#' + player[1]).removeClass('gone').children('.icon_text').remove();
+        const playerdiv = $('#' + player[1]);
+        playerdiv.removeClass('gone').children('.icon_text').remove();
+        if (playerdiv.hasClass('special')){
+            playerdiv.addClass('mystery')
+        }
         current_icon = "";
         $('#input_nick').val("");
         check_player();
@@ -199,7 +209,7 @@ $(document).ready(function () {
         let nick = $('#input_nick');
         players.push([nick.val(), current_icon]);
         if (players.length === parseInt($("#input_players").val())){
-            start_scoreboard()
+            start_scoreboard('init')
         }
         else {
             $('.chosen').addClass('gone').append('<div class="icon_text">' + nick.val() + '</div>');
@@ -239,8 +249,15 @@ $(document).ready(function () {
             $('#icon_barret').removeClass('mystery')
         }
     }
-    function start_scoreboard() {
-        console.log("start")
+    function start_scoreboard(load) {
+        if ($('#input_shuffle').html() === 'TRUE'){
+            players = shuffle(players)
+        }
+        window.location.href = 'scoreboard.html?load=' + load +
+            '&players=' + encodeURI(players) +
+            '&controllers=' + $('#input_controllers').val() +
+            '&rounds=' + $('#input_rounds').val();
+
     }
 
     function update_menu(menu, row, col) {
@@ -269,32 +286,6 @@ $(document).ready(function () {
 });
 
 
-
-function update_menu(menu, row, col) {
-    if (col > menu[row].length - 1){
-        col = menu[row].length - 1;
-    }
-    for (let i = 0; i < menu.length; i++) {
-        for (let j = 0; j < menu[i].length; j++) {
-            if (i === row && j === col) {
-                $('#' + menu[i][j]).addClass('selected').focus()
-            } else {
-                let current = $('#' + menu[i][j]);
-                current.removeClass('selected').blur();
-                if (current.attr('type') === 'number') {
-                    if (parseInt(current.val()) < current.attr('min')) {
-                        current.val(current.attr('min'))
-                    } else if (parseInt(current.val()) > current.attr('max')) {
-                        current.val(current.attr('max'))
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-
 function create_icon_buttons(normal, special, menu){
     let hotomolo = '';
     let icons = [];
@@ -321,4 +312,24 @@ function create_icon_buttons(normal, special, menu){
 
     icons_box.html(hotomolo);
     return menu.concat(all_icons)
+}
+
+
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
 }

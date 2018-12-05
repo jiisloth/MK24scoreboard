@@ -1,0 +1,204 @@
+@font-face {
+    font-family: "cybersloth";
+    src: url(font/CyberSloth.ttf) format("truetype");
+}
+
+body, html{
+    background: #483ece url("images/misc/background3.png");
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: "cybersloth", sans-serif, Tahoma;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.cup_holder{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    background-color: black;
+}
+.cup {
+    width: 48%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+.map {
+    width: 25%;
+    max-height: 140px;
+    overflow: hidden;
+    position: relative;
+}
+.map > img {
+    width: 100%;
+}
+.mapcount {
+    color: rgb(249, 255, 209);
+    text-shadow: 2px 2px black, -2px 2px black, 2px -2px black, -2px -2px black, 2px 0 black, 0 2px black, -2px 0 black, 0 -2px black;
+    position: absolute;
+    font-size: 32px;
+    bottom: 0px;
+    right: 2px;
+}
+
+.bottom {
+    position: absolute;
+    bottom: 0;
+}
+.top {
+    position: absolute;
+    top: 0;
+}
+#container{
+    position: absolute;
+    margin: 140px 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+#players {
+    width: 280px;
+    padding-top: 40px;
+    box-sizing: border-box;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+#rounds {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding-left: 280px;
+    display: flex;
+    justify-content: stretch;
+    flex-wrap: nowrap;
+}
+.round {
+    flex-grow: 1;
+    flex-basis: 0;
+    text-align: center;
+    color: #ffffff;
+    text-shadow: 2px 2px black, -2px 2px black, 2px -2px black, -2px -2px black, 2px 0 black, 0 2px black, -2px 0 black, 0 -2px black;
+    font-size: 40px;
+    overflow: hidden;
+}
+.round:nth-child(odd){
+    background-color: rgba(255, 248, 127, 0.32);
+}
+.player {
+    flex-grow: 1;
+    flex-basis: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+.line{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    font-size: 32px;
+    margin: 0 2px;
+    width: 54px;
+    color: #3474df;
+    text-shadow: 2px 2px #000000, -2px 2px #000000, 2px -2px #000000, -2px -2px #000000, 2px 0 black, 0 2px black, -2px 0 black, 0 -2px black;
+}
+
+.info{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.info_char{
+    width: 48px;
+    height: 36px;
+    margin-left: -10px;
+    margin-right: 5px;
+}
+
+.info > div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.character{
+    z-index: 10;
+    margin-top: -10px;
+    position: absolute;
+    transition: transform 0.6s ease-out;
+}
+.special{
+    position: absolute;
+    margin-top: 25px;
+}
+.special2{
+    z-index: 100;
+}
+.wins, .plays, .playsline{
+    display: inline-block;
+    width: 30px;
+    margin-left: 3px;
+    font-size: 24px;
+}
+.name{
+    font-size: 32px;
+    color: #fff87f;
+    text-shadow: 2px 2px #000000, -2px 2px #000000, 2px -2px #000000, -2px -2px #000000, 2px 0 black, 0 2px black, -2px 0 black, 0 -2px black;
+}
+
+.goal{
+    background-color: rgba(125, 255, 5, 0.39);
+}
+.dnf{
+    filter: grayscale(100%);
+}
+.driving {
+    /* Start the shake animation and make the animation last for 0.5 seconds */
+    animation: drive 0.4s;
+    /* When the animation is finished, start again */
+    animation-iteration-count: infinite;
+}
+.jonne{
+    animation: jonned 0.5s;
+    /* When the animation is finished, start again */
+    animation-iteration-count: infinite, infinite;
+    margin-left: 16px;
+}
+
+
+@keyframes drive {
+    0% { transform: translate(0px, 0px) rotate(0deg); }
+    10% { transform: translate(0px, -1px) rotate(-1deg); }
+    20% { transform: translate(0px, 0px) rotate(1deg); }
+    30% { transform: translate(0px, 1px) rotate(0deg); }
+    40% { transform: translate(0px, -1px) rotate(1deg); }
+    50% { transform: translate(0px, 1px) rotate(-1deg); }
+    60% { transform: translate(0px, 1px) rotate(0deg); }
+    70% { transform: translate(0px, 1px) rotate(-1deg); }
+    80% { transform: translate(0px, -1px) rotate(1deg); }
+    90% { transform: translate(0px, 1px) rotate(0deg); }
+    100% { transform: translate(0px, -1px) rotate(-1deg); }
+}
+@keyframes jonned {
+    0% { transform: translate(0px, 0px) rotate(0deg) scaleX(-1); }
+    10% { transform: translate(0px, -1px) rotate(-1deg) scaleX(-1); }
+    20% { transform: translate(0px, 0px) rotate(1deg) scaleX(-1); }
+    30% { transform: translate(0px, 1px) rotate(0deg) scaleX(-1); }
+    40% { transform: translate(0px, -1px) rotate(1deg) scaleX(-1); }
+    50% { transform: translate(0px, 1px) rotate(-1deg) scaleX(-1); }
+    60% { transform: translate(0px, 1px) rotate(0deg) scaleX(-1); }
+    70% { transform: translate(0px, 1px) rotate(-1deg) scaleX(-1); }
+    80% { transform: translate(0px, -1px) rotate(1deg) scaleX(-1); }
+    90% { transform: translate(0px, 1px) rotate(0deg) scaleX(-1); }
+    100% { transform: translate(0px, -1px) rotate(-1deg) scaleX(-1); }
+}

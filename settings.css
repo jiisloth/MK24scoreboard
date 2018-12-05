@@ -4,20 +4,23 @@
 }
 
 body, html{
-    background-color: #3a3191;
+    background: #3a3191 url("images/misc/background2.png");
     width: 100%;
     height: 100%;
     margin: 0;
     font-family: "cybersloth", sans-serif, Tahoma;
     padding: 0;
     overflow: hidden;
+    position: relative;
 }
 
 #settings {
+    position: absolute;
     display: flex;
-    margin: 10%;
-    height: 80%;
-    width: 80%;
+    left: 10%;
+    right: 10%;
+    top: 10%;
+    bottom: 10%;
 }
 
 #menu {
