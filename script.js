@@ -238,7 +238,10 @@ function draw_state(state, controllers, mapstate, maplist) {
             $('#p' + i +' > .character > .driving').css('animation-delay', '-0.' + i +'s');
             $('#p' + i +' > .line').html('<img src="images/icons/player' + (state.line[i] + 1) + '.png"/>');
             $('#p' + i +' > div > div > .stats > .playslineico').show();
-            if (i !== jonne && state.wins[i] === 0){
+            if (i !== jonne && state.wins[i] === 0 ){
+                jonne_active = 0
+            }
+            if (i !== jonne && state.playsline[i] >= state.playsline[jonne]){
                 jonne_active = 0
             }
 
@@ -253,7 +256,6 @@ function draw_state(state, controllers, mapstate, maplist) {
         // spessut
         let spes = state.spes[i].split('-');
         for (let s = 1; s < spes.length; s++){
-            console.log(290 + width/2)
             $('#p' + i ).append(
                 '<img src="images/icons/special.png" class="special" ' +
                 'style="left:' + (280 + parseInt(spes[s]) * width + width/2 -14)  + 'px">').append(
@@ -265,7 +267,7 @@ function draw_state(state, controllers, mapstate, maplist) {
         $('#' + maplist[Math.floor(m/4)][m%4] +' > .mapcount').html(mapstate[m])
     }
     $('.character > img').removeClass('jonne');
-    if (jonne_active > 0){
+    if (jonne_active > 0 && state.playsline[jonne] > 0){
         $('#p' + jonne +' > .character > img').addClass('jonne');
     }
 }

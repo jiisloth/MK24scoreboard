@@ -28,7 +28,8 @@ body, html{
     width: 50%;
 }
 #filler {
-
+    background: url("images/misc/menuimg.png") no-repeat;
+    background-size: contain;
     width: 50%;
 }
 

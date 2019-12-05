@@ -10,7 +10,7 @@ $(document).ready(function () {
     const playericons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad',
         'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette',
         'bowsette2'];
-    const specialicons = ['misato2', 'megaman', 'barret'];
+    const specialicons = ['misato2', 'megaman', 'barret', 'kratos'];
 
     player_menu = create_icon_buttons(playericons,specialicons, player_menu);
 
@@ -129,7 +129,7 @@ $(document).ready(function () {
         update_tab($('#start_menu'), start_menu)
     });
     $('.icon').click(function () {
-        if (!$(this).hasClass('gone')) {
+        if (!$(this).hasClass('gone') && !$(this).hasClass('mystery')) {
             $('.icon').removeClass('chosen');
             $(this).addClass('chosen');
             current_icon = current_menu[current_link_row][current_link_col];
@@ -243,6 +243,8 @@ $(document).ready(function () {
 
         if (name === 'jsloth' || name === 'slotti'){
             $('#icon_misato2').removeClass('mystery')
+        } else if (name === 'Kannadan') {
+            $('#icon_kratos').removeClass('mystery')
         } else if (name === 'Mega_Tron') {
             $('#icon_megaman').removeClass('mystery')
         } else if (name === 'ssarste') {
