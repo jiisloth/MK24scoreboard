@@ -10,7 +10,7 @@ $(document).ready(function () {
     const playericons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad',
         'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette',
         'bowsette2'];
-    const specialicons = ['misato2', 'megaman', 'barret', 'kratos'];
+    const specialicons = ['zerotwo', 'megaman', 'barret', 'kratos'];
 
     player_menu = create_icon_buttons(playericons,specialicons, player_menu);
 
@@ -242,7 +242,7 @@ $(document).ready(function () {
         $('.special:not(.gone)').addClass('mystery').removeClass('selected');
 
         if (name === 'jsloth' || name === 'slotti'){
-            $('#icon_misato2').removeClass('mystery')
+            $('#icon_zerotwo').removeClass('mystery')
         } else if (name === 'Kannadan') {
             $('#icon_kratos').removeClass('mystery')
         } else if (name === 'Mega_Tron') {
