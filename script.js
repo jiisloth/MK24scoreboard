@@ -1,3 +1,4 @@
+const golden = ['megaman', 'kratos', 'barret'];
 $(document).ready(function () {
     let settings = read_attributes();
     let states;
@@ -25,7 +26,6 @@ $(document).ready(function () {
         currentstate = states.length-1;
         currentmapstate = mapstates.length-1;
     }
-
     const maps = [
         ['LuigiCircuit', 'PeachBeach', 'BabyPark', 'DryDryDesert'],
         ['MushroomBridge', 'MarioCircuit', 'DaisyCruiser', 'WaluigiStadium'],
@@ -137,6 +137,12 @@ function generate_rounds(rounds) {
 function generate_players(players) {
     $('#players').html("");
     for (let p = 0; p < players.length; p ++){
+        let gold = ""
+        console.log(players[p][1])
+        if (golden.includes(players[p][1])){
+            console.log(players[p][1])
+            gold = ' class="winner" '
+        }
         $('#players').append('<div id="p' + p +'" class="player">' +
             '<div class="line">' +
             p + '.' +
@@ -153,7 +159,7 @@ function generate_players(players) {
             '</div>' +
             '</div>' +
             '<div class="character">' +
-                '<img src="images/playerIcons/' + players[p][1] + '.png">' +
+                '<img ' + gold + ' src="images/playerIcons/' + players[p][1] + '.png">' +
             '</div>' +
             '</div>')
     }

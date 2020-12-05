@@ -10,7 +10,7 @@ $(document).ready(function () {
     const playericons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad',
         'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette',
         'bowsette2'];
-    const specialicons = ['zerotwo', 'megaman', 'barret', 'kratos'];
+    const specialicons = ['zerotwo', 'megaman', 'barret', 'kratos', 'Nyan'];
 
     player_menu = create_icon_buttons(playericons,specialicons, player_menu);
 
@@ -249,6 +249,8 @@ $(document).ready(function () {
             $('#icon_megaman').removeClass('mystery')
         } else if (name === 'ssarste') {
             $('#icon_barret').removeClass('mystery')
+        } else if (name === 'muikea') {
+            $('#icon_Nyan').removeClass('mystery')
         }
     }
     function start_scoreboard(load) {
