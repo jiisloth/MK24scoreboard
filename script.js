@@ -138,9 +138,7 @@ function generate_players(players) {
     $('#players').html("");
     for (let p = 0; p < players.length; p ++){
         let gold = ""
-        console.log(players[p][1])
         if (golden.includes(players[p][1])){
-            console.log(players[p][1])
             gold = ' class="winner" '
         }
         $('#players').append('<div id="p' + p +'" class="player">' +
