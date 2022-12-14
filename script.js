@@ -1,486 +1,367 @@
-/**
- * Created by lapsloth on 25.1.2017.
- */
+const golden = ['megaman', 'kratos', 'barret', 'geralt'];
 
+const socket = new WebSocket('wss://mk24.hellokopter.com:443');
+let is_online = false
+// Connection opened
+socket.addEventListener('open', function (event) {
+    is_online = true
+    socket.send(JSON.stringify({'type': 'host'}));
+});
 
-var maps = ["LuigiCircuit", "PeachBeach", "BabyPark", "DryDryDesert", "MushroomBridge", "MarioCircuit", "DaisyCruiser", "WaluigiStadium", "SherbetLand", "MushroomCity", "YoshiCircuit", "DKMountain", "WarioColosseum", "DinoDinoJungle", "BowserCastle", "RainbowRoad"];
-var mapCount = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
-var keyCodeIds = {49:0, 50:1, 51:2, 52:3, 53:4, 54:5, 55:6, 56:7, 57:8, 48:9, 81:10, 87:11, 69:12, 82:13, 84:14, 89:15, 85:16, 73:17, 79:18, 80:19};
-
-var betterRandom;
-var seed;
-var mapNumber;
-
-var controllers = 0;
-var players = [];
-
-var mapList = [];
-
-var playing = [];
-var que = [];
-
-var jonne = "none";
-
-var rounds = 0;
-
-var i;
-var lastPlayer = [];
-
-var shift = false;
-
-
-function playerMove(id) {
-        players[id][2] += 1;
-        var temp = playing[playing.indexOf(id)];
-        playing[playing.indexOf(id)] = que[0];
-        lastPlayer.push(que[0]);
-        que.splice(0,1);
-        que.push(temp);
-        checkJonne();
-        updateQue();
-}
-
-function checkJonne() {
-    var count = 0;
-    for (i = 0; i < playing.length; i++){
-        if (players[playing[i]][2] > 0){
-            count += 1;
-        } else {
-            jonne = playing[i];
-
-        }
+// Listen for messages
+socket.addEventListener('message', function (event) {
+    let msg = JSON.parse(event.data)
+    if (msg.type === "init_lobby"){
+        console.log("JOINCODE: " + msg.secret)
     }
-
-    if (count >= playing.length){
-        var sofa = playing.slice(0);
-        var lastPlayerCopy = lastPlayer.slice(0);
-        for (i = lastPlayerCopy.length-1; i >= 0; i--){
-            if (typeof lastPlayerCopy[i] === "string") {
-                lastPlayerCopy[i] = parseInt(lastPlayerCopy[i].split(":")[1]);
-            }
-        }
-        for (i = lastPlayerCopy.length-1; i >= 0; i--){
-            if (sofa.indexOf(lastPlayerCopy[i]) != -1){
-                sofa.splice(sofa.indexOf(lastPlayerCopy[i]), 1);
-                if (sofa.length == 1) {
-                    jonne = sofa[0];
-                }
-            }
-        }
+    if (msg.type === "get_settings"){
+        socket.send(JSON.stringify({'type': 'settings', 'settings': settings_to_send}));
     }
-    if (count < playing.length - 1 && count >= 0){
-        jonne = "none";
-        $(".playerImage").removeClass("jonne");
+    if (msg.type === "get_state"){
+        socket.send(JSON.stringify({'type': 'init_state', 'state': states[currentstate]}));
     }
-    if (jonne != "none"){
-        $(".playerImage").removeClass("jonne");
-        $("#playerImage"+jonne).addClass("jonne");
-    }
+});
 
-}
+let settings_to_send
 
-
-function undoMove() {
-    var errorOne;
-    var lastOne = lastPlayer.pop();
-    if (typeof lastOne === "string"){
-        if (lastOne.split(":")[0] === "<-ss"){
-            lastOne = parseInt(lastOne.split(":")[1]);
-            errorOne = que.pop();
-            playing[playing.indexOf(lastOne)] = errorOne;
-            que.unshift(lastOne);
-            // lastPlayer.push(errorOne);
-        } else {
-            lastOne = parseInt(lastOne.split(":")[1]);
-            errorOne = que.pop();
-            playing[playing.indexOf(lastOne)] = errorOne;
-            que.unshift(lastOne);
-            lastPlayer.push(errorOne);
-        }
-
-    } else {
-        errorOne = que.pop();
-        playing[playing.indexOf(lastOne)] = errorOne;
-        que.unshift(lastOne);
-        players[errorOne][2] -= 1;
-        $("#playerImage" + errorOne).css({
-            'right': '-' + ($(".numberSlot").width() * (1 + players[errorOne][2]) - 5) + 'px',
-            'left': 'auto'
-        });
-        if (betterRandom) {
-            updateMapCount(-1);
-            mapNumber -= 1;
-            getMap();
-        }
-    }
-    checkJonne();
-    updateQue();
-
-}
-
-function superskip() {
-    var skip = prompt("Skip controller number:", "");
-
-    if (skip == null || skip == "") {
-        return
-    } else if (0 < skip && skip <= controllers ){
-        lastOne = playing[skip-1];
-        var temp = playing[playing.indexOf(lastOne)];
-        playing[playing.indexOf(lastOne)] = que[0];
-        lastPlayer.push("<-ss:"+que[0]);
-        que.splice(0,1);
-        que.push(temp);
-        checkJonne();
-        updateQue();
-        return
-    }
-
-    superskip()
-}
-
-
-function skippy() {
-    var lastOne;
-    if (typeof lastPlayer[lastPlayer.length-1] === "string") {
-        if (lastPlayer[lastPlayer.length-1].split(":")[0] === "<-ss"){
-            superskip();
-            return
-        }
-        lastOne = parseInt(lastPlayer[lastPlayer.length-1].split(":")[1]);
-    } else if (typeof lastPlayer[lastPlayer.length-1] === "number"){
-        lastOne = lastPlayer.pop();
-    } else {
-        lastOne = superskip();
-        return
-    }
-    var temp = playing[playing.indexOf(lastOne)];
-    playing[playing.indexOf(lastOne)] = que[0];
-    lastPlayer.push("<-s:"+que[0]);
-    que.splice(0,1);
-    que.push(temp);
-    checkJonne();
-    updateQue();
-}
-
-
-function writeCookie() {
-    var now = new Date();
-    now.setMonth(now.getMonth() + 1);
-    if (lastPlayer.length > 0) {
-        document.cookie = "?players=" + encodeURI(players) + "&rounds=" + rounds + "&controllers=" + controllers + "&betterRandom=" + betterRandom + "&seed=" + seed + "&mapNumber=" + mapNumber + "&lastPlayer=" + lastPlayer + "&playing=" + playing + "&que=" + que + "&mapCount=" + mapCount + ";expires=" + now.toUTCString() + ";";
-    } else {
-        document.cookie = "?players=" + encodeURI(players) + "&rounds=" + rounds + "&controllers=" + controllers + "&betterRandom=" + betterRandom + "&seed=" + seed + "&mapNumber=" + mapNumber + ";expires=" + now.toUTCString() + ";";
+function send_data(data) {
+    if (is_online){
+        socket.send(JSON.stringify(data));
     }
 }
 
-function readParameters(){
-    var params = window.location.search;
-    var paramsFromUrl = "yes";
-    if (!params){
-        paramsFromUrl = "no";
-        params = document.cookie;
-        if (!params){
-            window.location.href = "index.html";
-        }
-    }
-    params = params.substring(1).split("&");
-    if (params.length > 6) {
-        lastPlayer = params[6].split("=")[1].split(",");
-        for (i = 0; i < lastPlayer.length; i++) {
-            if (!isNaN(lastPlayer[i])) {
-                lastPlayer[i] = parseInt(lastPlayer[i])
-            }
-        }
-        playing = params[7].split("=")[1].split(",");
-        for (i = 0; i < playing.length; i++) {
-            playing[i] = parseInt(playing[i])
-        }
-        que = params[8].split("=")[1].split(",");
-        for (i = 0; i < que.length; i++) {
-            que[i] = parseInt(que[i])
-        }
-        mapCount = params[9].split("=")[1].split(",");
-        for (i = 0; i < mapCount.length; i++) {
-            mapCount[i] = parseInt(mapCount[i])
-        }
-    }
-    betterRandom = (params[3].split("=")[1] == "true");
-    seed = parseInt(params[4].split("=")[1]);
-    mapNumber = parseInt(params[5].split("=")[1]);
-    controllers = parseInt(params[2].split("=")[1]);
-    rounds = parseInt(params[1].split("=")[1]);
-    params = decodeURI(params[0].split("=")[1]).split(",");
-    var player = [];
-    for (i = 0; i < params.length; i++) {
-        player.push(params[i]);
-        if (player.length == 3){
-            player[2] = parseInt(player[2]);
-            players.push(player);
-            player = []
-        }
-    }
-    if (paramsFromUrl == "yes") {
-        writeCookie();
-        window.location.href = "scoreboard.html";
-    }
-
-}
-// ?players=qweqwe,donkeykong,0,qweqwe,daisy,0,qweqw,toadette,0,asds,toad,0,qawewq,peach,0,awdaw,luigi,0,asdsd,yoshi,0,weq,bowser,0,asdad,mario,0,qweq,mage,0&rounds=24
-
-
-function updateQue(){
-    for (i = 0; i < playing.length; i++) {
-        var div = $("#player" + (playing[i])+" .name"+" .turnNumber");
-        div.html( $("<img src='images/icons/player" + (i + 1) + ".png'>"));
-    }
-    for (i = 0; i < que.length; i++) {
-        div = $("#player" + (que[i])+" .name"+" .turnNumber");
-        div.text((i + 1) +".");
-    }
-    for (i = 0; i < players.length; i++) {
-        $("#info-score" + i ).text(players[i][2])
-    }
-}
-
-function random()
-{
-
-    m_z = (36969 * (m_z & 65535) + (m_z >> 16)) & mask;
-    m_w = (18000 * (m_w & 65535) + (m_w >> 16)) & mask;
-    var result = ((m_z << 16) + m_w) & mask;
-    result /= 4294967296;
-    return result + 0.5;
-}
-
-var m_w = 123446366789;
-var m_z = 987654321;
-var mask = 0xffffffff;
-
-function randomMapList() {
-    for (i = 0; i < rounds * players.length*2; i++) {
-        var map = Math.floor(random() * 16);
-        if (mapList.length > 0) {
-            while (map == mapList[mapList.length - 1]) {
-                map = Math.floor(random() * 16);
-            }
-        }
-        mapList.push(map);
-    }
-}
-
-function flashMap() {
-    $("#map"+mapList[mapNumber]).children().first().toggleClass("highlight");
-    setTimeout(flashMap, 700)
-}
-
-function getMap() {
-    $(".mapImage").addClass("highlight");
-    $("#map"+mapList[mapNumber]).children().first().removeClass("highlight");
-}
-function updateMapCount(value) {
-    mapCount[mapList[mapNumber]] += value;
-    $("#mapCount" + mapList[mapNumber]).text(mapCount[mapList[mapNumber]]);
-    writeCookie();
-
-}
-
-function animateEngine(){
-    for (i = 0; i < playing.length; i++) {
-        $("#playerImage" + playing[i]).css({
-            'bottom': Math.random() + 'px',
-            'top': 'auto'
-        });
-    }
-    setTimeout(animateEngine, 30);
-}
-
-function animateDrive(){
-    for (i = 0; i < players.length; i++) {
-        var offset = parseInt($("#playerImage" + i).css('right'));
-        var goal = parseInt($(".numberSlot").width() * (1 + players[i][2]) - 5)*-1;
-
-        if (offset > goal){
-            offset -= 2;
-            $("#playerImage" + i).css({
-                'right':  + offset + 'px',
-                'left': 'auto',
-                'bottom': Math.random() + 'px',
-                'top': 'auto'
-            });
-
-        }
-    }
-    setTimeout(animateDrive, 30);
-}
-
-function resetSize() {
-    $("#container").height($(window).height() - ($("#top").height()*2));
-    $(".numberSlot").css("line-height", $(".playerSlot").height() + "px").height($(window).height() - ($("#top").height() *2));
-    $(".playerSlot").height($("#container").height() / (players.length + 1.1));
-    for (i = 0; i < players.length; i++) {
-        $("#playerImage" + i).css({
-            'right':'-' + ($(".numberSlot").width() * (1 + players[i][2]) - 5) + 'px',
-            'left': 'auto'
-        });
-    }
-}
-
-
-function createQue() {
-    var i;
-    for (i = 0; i < controllers; i ++){
-        playing.push(i)
-    }
-    for (i = controllers; i < players.length; i ++){
-        que.push(i)
-    }
-}
-
+let states;
+let state;
+let mapstates;
+let currentstate;
+let currentmapstate;
 
 $(document).ready(function () {
-    readParameters();
-    m_w = seed;
-    randomMapList();
+    let settings = read_attributes();
+    let hold_button = {};
+    if (settings.mode === 'init'){
+        state = init_state(settings.players, settings.controllers);
+        states = [add_state(state)];
+        mapstates = [init_mapstate()];
+        settings.mode = 'cookie';
+        localStorage.states = JSON.stringify(states);
+        localStorage.settings = JSON.stringify(settings);
+        localStorage.maps = JSON.stringify(mapstates);
+        window.location.href =  "scoreboard.html";
+        currentstate = 0;
+        currentmapstate = 0;
+    } else if (settings.mode === 'cookie'){
+        states = JSON.parse(localStorage.states);
+        settings = JSON.parse(localStorage.settings);
+        mapstates = JSON.parse(localStorage.maps);
 
-    if (playing.length == 0){
-        createQue();
+        currentstate = states.length-1;
+        currentmapstate = mapstates.length-1;
     }
+    settings_to_send = settings
+    const maps = [
+        ['LuigiCircuit', 'PeachBeach', 'BabyPark', 'DryDryDesert'],
+        ['MushroomBridge', 'MarioCircuit', 'DaisyCruiser', 'WaluigiStadium'],
+        ['SherbetLand', 'MushroomCity', 'YoshiCircuit', 'DKMountain'],
+        ['WarioColosseum', 'DinoDinoJungle', 'BowserCastle', 'RainbowRoad']];
+    const mapdict = generate_maps(maps); // Could use this instead of counting..
+    generate_rounds(settings.rounds);
+    generate_players(settings.players);
+    draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
 
-    for (i = 0; i < maps.length; i++) {
-        map = $('<div class="map" id="map'+  i + '"><img class="mapImage" src="images/maps/' + maps[i] + '.png"/><div id="mapCount'+  i + '" class="mapCount">' + mapCount[i] + '</div></div>');
-        cup = "#cup" + (Math.floor(i / 4) + 1);
-        map.appendTo($(cup));
+    $(document).keydown(function (e) {
+        if (e.keyCode === 8){
+            e.preventDefault()
+        }
+        const pcodes = [49,50,51,52,53,54,55,56,57,48,81,87,69,82,84,89,85,73,79,80];
+        const mcodes = [65,83,68,70, 71,72,74,75, 90,88,67,86, 66,78,77,188];
+        if (pcodes.indexOf(e.keyCode) < settings.players.length && pcodes.indexOf(e.keyCode) >= 0){
+            let state = false
+            if (currentstate !== states.length-1) {
+                states = states.slice(0, currentstate + 1)
+            }
+            if (hold_button[46]) {
+                state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'dnf')
+                states.push(state);
+                currentstate = states.length-1;
+                localStorage.states = JSON.stringify(states);
+            } else if (states[currentstate].line[pcodes.indexOf(e.keyCode)] < settings.controllers){
+                if (hold_button[8]){ // backspace
+                    state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'skip')
+                    states.push(state);
+                } else if (hold_button[16]){ // shift
+                    state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'spes')
+                    states.push(state);
+                } else {
+                    state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'win')
+                    states.push(state);
+                }
+                currentstate = states.length-1;
+                localStorage.states = JSON.stringify(states);
+            }
+            if (state){
+                send_data({"type": "state", "state": state})
+            }
+        } else if (e.keyCode === 37) { // LEFT
+            if (currentstate > 0){
+                currentstate -= 1;
+                            }
+        }
+        else if (e.keyCode === 39) { // RIGHT
+            if (currentstate < states.length-1){
+                currentstate += 1;
+                            }
+        }
+        else if (mcodes.indexOf(e.keyCode) < mapstates[currentmapstate].length && mcodes.indexOf(e.keyCode) >= 0){
+            if (currentmapstate !== mapstates.length-1){
+                    mapstates = mapstates.slice(0, currentmapstate+1)
+            }
+            let new_mapstate = mapstates[currentmapstate].slice();
+            new_mapstate[mcodes.indexOf(e.keyCode)] += 1;
+            mapstates.push(new_mapstate);
+            send_data({"type": "mapstate", "mapstate": new_mapstate})
+            currentmapstate = mapstates.length -1;
+            localStorage.maps = JSON.stringify(mapstates);
+        } else if (e.keyCode === 109 || e.keyCode === 189) { // num.minus
+            if (currentmapstate > 0){
+                currentmapstate -= 1;
+            }
+        }
+        else if (e.keyCode === 107 || e.keyCode === 187) { // num.plus
+            if (currentmapstate < mapstates.length-1){
+                currentmapstate += 1;
+            }
+        }
+        hold_button[e.keyCode] = true;
+        draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate], maps);
+    });
+    $(document).keyup(function (e) {
+        hold_button[e.keyCode] = false;
+    });
+    $('.map').click(function () {
+        for (let c = 0; c < maps.length; c++){
+            m = maps[c].indexOf(this.id);
+            if (m >= 0){
+                let new_mapstate = mapstates[currentmapstate].slice();
+                new_mapstate[c * 4 + m] += 1;
+                mapstates.push(new_mapstate);
+                send_data({"type": "mapstate", "mapstate": new_mapstate})
+                currentmapstate = mapstates.length -1;
+                localStorage.maps = JSON.stringify(mapstates);
+            }
+
+        }
+        draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
+    });
+});
+
+
+
+
+
+function generate_maps(maps) {
+    let mapdict = {};
+    for (let cup = 0; cup < maps.length; cup++){
+        for (let map = 0; map < maps[cup].length; map ++){
+            $('#cup_' + (cup + 1)).append('<div id="' + maps[cup][map] + '" class="map">' +
+                '<img src="images/maps/' + maps[cup][map] + '.png">' +
+                '<div class="mapcount">mapcount</div>' +
+                '</div>');
+            mapdict[maps[cup][map]] = (cup + 1) * (map + 1);
+        }
     }
-    $("#container").height($(window).height() - ($("#top").height() + $("#bottom").height()));
+    return mapdict
+}
 
+function generate_rounds(rounds) {
+    $('#rounds').html("");
+    for (let i = 0; i < rounds + 1; i ++){
+        $('#rounds').append('<div class="round">' + i + '</div>')
+    }
+    $('#rounds').append('<div class="round goal"><img src="images/icons/lastLap.png"></div>')
+}
 
-    for (i = 0; i < players.length; i++) {
-        playerslot = $('<div id="player' + i + '" class="playerSlot">' +
-            '<div class="name">' +
-            '<div class="turnNumber"></div>' +
-            '<img class="mini-p-img" src="images/playerIcons/' + players[i][1] + '.png">' +
+function generate_players(players) {
+    $('#players').html("");
+    for (let p = 0; p < players.length; p ++){
+        let gold = ""
+        if (golden.includes(players[p][1])){
+            gold = ' class="winner" '
+        }
+        $('#players').append('<div id="p' + p +'" class="player">' +
+            '<div class="line">' +
+            p + '.' +
+            '</div>' +
             '<div class="info">' +
-            '<div>' + decodeURI(players[i][0]) + '</div>' +
-            '<div class="info-score">' +
-            '<img src="images/icons/beer.png">' +
-            'x<div id="info-score' + i + '" class="info">0</div>' +
+            '<div><img class="info_char" src="images/playerIcons/' + players[p][1] + '.png"/></div>' +
+            '<div>' +
+            '<div class="name">' + players[p][0] + '</div>' +
+            '<div class="stats">' +
+            '<img src="images/icons/win.png"><div class="wins"></div>' +
+            '<img src="images/icons/plays.png"><div class="plays"></div>' +
+            '<div class="playslineico"><img src="images/icons/playsline.png"><div class="playsline"></div></div>' +
             '</div>' +
             '</div>' +
             '</div>' +
-            '<div id="score' + i + '" class="score"><div class="playerImageHolder"><img id="playerImage' + i + '" class="playerImage" src="images/playerIcons/' + players[i][1] + '.png"></div></div></div>')
-        playerslot.appendTo($("#container"));
+            '<div class="character">' +
+                '<img ' + gold + ' src="images/playerIcons/' + players[p][1] + '.png">' +
+            '</div>' +
+            '</div>')
     }
+}
 
-    $(".playerSlot").height($("#container").height() / (players.length + 1.1));
-
-    for (i = 0; i <= rounds; i++) {
-        if (i % 2 == 0) {
-            color = "transparent"
+function read_attributes() {
+    let attr = decodeURI(window.location.search.substring(1));
+    if (attr){
+        attr = attr.split('&');
+        const load = attr[0].split('=')[1];
+        if (load === 'init') {
+            const pt = attr[1].split('=')[1].split(',');
+            let players = [];
+            for (let p = 0; p < pt.length / 2; p++) {
+                players.push([pt[p * 2], pt[p * 2 + 1].split("icon_")[1]]);
+            }
+            const controllers = parseInt(attr[2].split('=')[1]);
+            const rounds = parseInt(attr[3].split('=')[1]);
+            return {mode: load, players: players, controllers: controllers, rounds: rounds};
         } else {
-            color = "rgba(0, 0, 0, 0.44)"
+            return {mode: load};
         }
-        number = $('<div class=numberSlot style="background-color: ' + color + '; width: ' + 100/(rounds+1) +'%">' + i + '</div>');
-        number.appendTo($("#marker"));
+    } else {
+        return {mode: 'cookie'};
     }
-    number = $('<div class=numberSlot style="background-color: rgba(204,194,0,0.65); width: ' + 100/(rounds+1) +'%"><img class="helpOPEN" src="images/icons/lastLap.png"></div>');
-    number.appendTo($("#marker"));
 
+}
 
-    $(".numberSlot").css("line-height", $(".playerSlot").height() + "px");
-    $(".numberSlot").height($(window).height() - ($("#top").height() + $("#bottom").height()));
-    $(".playerImage").css({
-        'right':'-' + ($(".numberSlot").width() * 1 - 5) + 'px',
-        'left': 'auto'
-    });
-
-    updateQue();
-
-
-    $(".map").click( function () {
-        if (!betterRandom) {
-            var id = parseInt(($(this).attr('id').replace("map", "")));
-            mapCount[id] += 1;
-            $("#mapCount" + id).text(mapCount[id]);
-            writeCookie();
+function init_state(players, controllers) {
+    let wins = [];
+    let plays = [];
+    let playsline = [];
+    let line = [];
+    let dnf = [];
+    let spes = [];
+    const consuf = [0,2,1,3,4,6,5,7];
+    for (let p = 0; p < players.length; p ++) {
+        wins.push(0);
+        plays.push(0);
+        playsline.push(0);
+        if (p < controllers){
+            line.push(consuf[p]);
+        } else {
+            line.push(p)
         }
-    });
+        spes.push("");
+        dnf.push(false)
+    }
+    return {wins: wins, plays:plays, playsline:playsline, line:line, dnf:dnf, spes:spes}
+}
 
-    $(".map").contextmenu( function (e) {
-        e.preventDefault();
-        if (!betterRandom) {
-            var id = parseInt(($(this).attr('id').replace("map", "")));
-            mapCount[id] -= 1;
-            $("#mapCount" + id).text(mapCount[id]);
-            writeCookie();
+function init_mapstate() {
+    return [0,0,0,0, 0,0,0,0, 0,0,0,0 ,0,0,0,0];
+}
+
+function add_state(state) {
+    return {
+        wins: state.wins.slice(),
+        plays: state.plays.slice(),
+        playsline: state.playsline.slice(),
+        line: state.line.slice(),
+        spes: state.spes.slice(),
+        dnf: state.dnf.slice()
+    }
+}
+
+function draw_state(state, controllers, mapstate, maplist) {
+    const jonne = state.playsline.indexOf(Math.max.apply(Math, state.playsline));
+    const width = $('.round').width();
+    let jonne_active = 1;
+    $('.character > img').removeClass('driving');
+    $('.player').removeClass('dnf');
+    $('.special').remove();
+    for (let i = 0; i < state.wins.length; i ++){
+        let left = (195 + (state.wins[i]+1) * width) + "px";
+        $('#p' + i +' > .character').css({"-webkit-transform":"translate("+left+",0px)"});
+        $('#p' + i +' > div > div > .stats > .wins').html(state.wins[i]);
+        $('#p' + i +' > div > div > .stats > .plays').html(state.plays[i]);
+        $('#p' + i +' > div > div > .stats > .playslineico > .playsline').html(state.playsline[i]);
+        if (state.line[i] < controllers){
+            $('#p' + i +' > .character > img').addClass('driving');
+            $('#p' + i +' > .character > .driving').css('animation-delay', '-0.' + i +'s');
+            $('#p' + i +' > .line').html('<img src="images/icons/player' + (state.line[i] + 1) + '.png"/>');
+            $('#p' + i +' > div > div > .stats > .playslineico').show();
+            if (i !== jonne && state.wins[i] === 0 ){
+                jonne_active = 0
+            }
+            if (i !== jonne && state.playsline[i] >= state.playsline[jonne]){
+                jonne_active = 0
+            }
+
+        } else {
+            $('#p' + i +' > .line').html((state.line[i] - controllers + 1) + ".");
+            $('#p' + i +' > div > div > .stats > .playslineico').hide()
         }
-    });
+        if (state.dnf[i]){
+            $('#p' +  i).addClass('dnf');
+            $('#p' + i +' > .line').html('DNF');
+        }
+        // spessut
+        let spes = state.spes[i].split('-');
+        for (let s = 1; s < spes.length; s++){
+            $('#p' + i ).append(
+                '<img src="images/icons/special.png" class="special" ' +
+                'style="left:' + (280 + parseInt(spes[s]) * width + width/2 -14)  + 'px">').append(
+                    '<img src="images/icons/special.png" class="special special2" ' +
+                'style="left:' + (280 + spes[s] * width + width/2 -14)  + 'px">')
+        }
+    }
+    for (let m = 0; m < mapstate.length; m ++){
+        $('#' + maplist[Math.floor(m/4)][m%4] +' > .mapcount').html(mapstate[m])
+    }
+    $('.character > img').removeClass('jonne');
+    if (jonne_active > 0 && state.playsline[jonne] > 0){
+        $('#p' + jonne +' > .character > img').addClass('jonne');
+    }
+}
 
-    $(".helpOPEN").click( function () {
-        $("#help").show()
-    });
-    $("#helpOK").click( function () {
-        $("#help").hide()
-    });
-
-    document.addEventListener('keydown', function(event) {
-        $("#help").hide()
-        if( keyCodeIds.hasOwnProperty(event.keyCode)) {
-            var id = keyCodeIds[event.keyCode];
-            if (id < players.length) {
-                if (playing.indexOf(id) != -1) {
-                    playerMove(id);
-                    if (betterRandom) {
-                        mapNumber += 1;
-                        updateMapCount(1);
-                        getMap();
-                    }
-                    writeCookie();
+function next_round(p, oldstate, s, action) {
+    let state = {wins: oldstate.wins.slice(),
+        plays: oldstate.plays.slice(),
+        playsline: oldstate.playsline.slice(),
+        line: oldstate.line.slice(),
+        spes: oldstate.spes.slice(),
+        dnf: oldstate.dnf.slice()};
+    if (action === 'spes') {
+        state.spes[p] += '-' + state.wins[p];
+    } else {
+        if (action === 'win') {
+            state.wins[p] += 1;
+            for (let i = 0; i < state.plays.length; i++) {
+                if (state.line[i] < s.controllers) {
+                    state.plays[i] += 1;
+                    state.playsline[i] += 1;
                 }
             }
         }
-        if ( event.keyCode == 8 ){
-            if (lastPlayer.length > 0) {
-                undoMove();
-                writeCookie();
+        state.playsline[p] = 0;
+        if (s.controllers <= state.line.length - 1 - state.dnf.filter(Boolean).length) {
+            for (let l = 0; l < state.line.length; l++) {
+                if (state.line[l] === s.controllers) {
+                    next_con = l
+                }
+                if (state.line[l] > s.controllers && !state.dnf[l]) {
+                    state.line[l] = state.line[l] - 1;
+                }
             }
-
-        }
-        if (event.keyCode == 16){
-            shift = true
-        }
-        if (event.keyCode == 46){
-            if (shift){
-                shift = false;
-                superskip();
+            state.line[next_con] = state.line[p];
+            if (action === 'dnf') {
+                state.line[p] = state.line.length - 1
+            } else {
+                state.line[p] = state.line.length - 1 - state.dnf.filter(Boolean).length;
             }
-            else {
-                skippy();
-            }
-            writeCookie();
-
         }
-
-    });
-    document.addEventListener('keyup', function(event) {
-        if (event.keyCode == 16){
-            shift = false
+        if (action === 'dnf') {
+            state.dnf[p] = true;
         }
-    });
-
-    if (betterRandom) {
-        updateMapCount(1);
-        getMap();
-        flashMap();
     }
-    animateEngine();
-    animateDrive();
-    checkJonne();
-
-
-    $(window).resize(function () {
-        resetSize();
-    });
-
-    resetSize();
-    setTimeout(resetSize, 500)
-});
+    return state
+}

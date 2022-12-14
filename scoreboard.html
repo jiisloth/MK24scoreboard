@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=5.1">
     <script src="jquery-3.1.1.js"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=5.1"></script>
     <title>MK24 LET'S GO!</title>
 </head>
 <body>
@@ -12,53 +12,16 @@
 
 
 <div id="scoreboard">
-    <div id="top" class="cupHolder">
-        <div id="cup1" class="cup">
-
-        </div>
-        <div id="cup2" class="cup"></div>
-    </div>
     <div id="container">
-        <div id="marker" class="playerSlot"></div>
-
-
+        <div id="players"></div>
+        <div id="rounds"></div>
     </div>
-    <div id="bottom" class="cupHolder">
-        <div id="cup3" class="cup"></div>
-        <div id="cup4" class="cup"></div>
+    <div class="cup_holder top">
+        <div id="cup_1" class="cup"></div><div id="cup_2" class="cup"></div>
     </div>
-
-</div>
-
-<div id="help">
-    <h2>Controls:</h2>
-    <div class="clear">
-        <span class="left">Player wins: </span><span class="right">1-0 & Q-P</span>
+    <div class="cup_holder bottom">
+        <div id="cup_3" class="cup"></div><div id="cup_4" class="cup"></div>
     </div>
-    <div class="clear">
-        <span class="left">Skip next player: </span><span class="right">DEL</span>
-            </div>
-    <div class="clear">
-
-        <span class="left">Skip racing player: </span><span class="right">SHIFT + DEL</span>
-            </div>
-    <div class="clear">
-    </div>
-    <div class="clear">
-        <span class="left">Undo: </span><span class="right">Backspace</span>
-    </div>
-    <div class="clear">
-        <span class="left">Mark played map: </span><span class="right">Click!</span>
-    </div>
-    <div class="clear">
-        </div>
-    <p class="center">
-        If you need to see these again just click me!
-        <br>
-        <img src="images/icons/lastLap.png">
-    </p>
-    <div id="helpOK">OK!</div>
-
 </div>
 </body>
 </html>
