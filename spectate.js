@@ -1,4 +1,4 @@
-const golden = ['megaman', 'kratos', 'barret', 'geralt'];
+const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire'];
 
 
 const socket = new WebSocket('wss://mk24.hellokopter.com:443');

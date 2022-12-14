@@ -1,7 +1,8 @@
-const golden = ['megaman', 'kratos', 'barret', 'geralt'];
+const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire'];
 
 const socket = new WebSocket('wss://mk24.hellokopter.com:443');
 let is_online = false
+let gamecode = ""
 // Connection opened
 socket.addEventListener('open', function (event) {
     is_online = true
@@ -13,6 +14,7 @@ socket.addEventListener('message', function (event) {
     let msg = JSON.parse(event.data)
     if (msg.type === "init_lobby"){
         console.log("JOINCODE: " + msg.secret)
+        gamecode = msg.secret
     }
     if (msg.type === "get_settings"){
         socket.send(JSON.stringify({'type': 'settings', 'settings': settings_to_send}));
@@ -35,6 +37,8 @@ let state;
 let mapstates;
 let currentstate;
 let currentmapstate;
+
+const playernumbers = "1234567890QWERTYUIOP"
 
 $(document).ready(function () {
     let settings = read_attributes();
@@ -153,6 +157,9 @@ $(document).ready(function () {
         }
         draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
     });
+    $('#gamecode').click(function () {
+        navigator.clipboard.writeText(gamecode);
+    });
 });
 
 
@@ -207,6 +214,7 @@ function generate_players(players) {
                 '<img ' + gold + ' src="images/playerIcons/' + players[p][1] + '.png">' +
             '</div>' +
             '</div>')
+        $('#howtoplayers').append('<span class="howtolistbutton">' + playernumbers[p] + '</span> - ' + players[p][0] + '<br>')
     }
 }
 
