@@ -1,11 +1,43 @@
-const golden = ['megaman', 'kratos', 'barret'];
+const golden = ['megaman', 'kratos', 'barret', 'geralt'];
+
+const socket = new WebSocket('wss://mk24.hellokopter.com:443');
+let is_online = false
+// Connection opened
+socket.addEventListener('open', function (event) {
+    is_online = true
+    socket.send(JSON.stringify({'type': 'host'}));
+});
+
+// Listen for messages
+socket.addEventListener('message', function (event) {
+    let msg = JSON.parse(event.data)
+    if (msg.type === "init_lobby"){
+        console.log("JOINCODE: " + msg.secret)
+    }
+    if (msg.type === "get_settings"){
+        socket.send(JSON.stringify({'type': 'settings', 'settings': settings_to_send}));
+    }
+    if (msg.type === "get_state"){
+        socket.send(JSON.stringify({'type': 'init_state', 'state': states[currentstate]}));
+    }
+});
+
+let settings_to_send
+
+function send_data(data) {
+    if (is_online){
+        socket.send(JSON.stringify(data));
+    }
+}
+
+let states;
+let state;
+let mapstates;
+let currentstate;
+let currentmapstate;
+
 $(document).ready(function () {
     let settings = read_attributes();
-    let states;
-    let state;
-    let mapstates;
-    let currentstate;
-    let currentmapstate;
     let hold_button = {};
     if (settings.mode === 'init'){
         state = init_state(settings.players, settings.controllers);
@@ -26,6 +58,7 @@ $(document).ready(function () {
         currentstate = states.length-1;
         currentmapstate = mapstates.length-1;
     }
+    settings_to_send = settings
     const maps = [
         ['LuigiCircuit', 'PeachBeach', 'BabyPark', 'DryDryDesert'],
         ['MushroomBridge', 'MarioCircuit', 'DaisyCruiser', 'WaluigiStadium'],
@@ -43,23 +76,31 @@ $(document).ready(function () {
         const pcodes = [49,50,51,52,53,54,55,56,57,48,81,87,69,82,84,89,85,73,79,80];
         const mcodes = [65,83,68,70, 71,72,74,75, 90,88,67,86, 66,78,77,188];
         if (pcodes.indexOf(e.keyCode) < settings.players.length && pcodes.indexOf(e.keyCode) >= 0){
+            let state = false
             if (currentstate !== states.length-1) {
                 states = states.slice(0, currentstate + 1)
             }
             if (hold_button[46]) {
-                states.push(next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'dnf'));
+                state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'dnf')
+                states.push(state);
                 currentstate = states.length-1;
                 localStorage.states = JSON.stringify(states);
             } else if (states[currentstate].line[pcodes.indexOf(e.keyCode)] < settings.controllers){
                 if (hold_button[8]){ // backspace
-                     states.push(next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'skip'));
+                    state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'skip')
+                    states.push(state);
                 } else if (hold_button[16]){ // shift
-                     states.push(next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'spes'));
+                    state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'spes')
+                    states.push(state);
                 } else {
-                     states.push(next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'win'));
+                    state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'win')
+                    states.push(state);
                 }
                 currentstate = states.length-1;
                 localStorage.states = JSON.stringify(states);
+            }
+            if (state){
+                send_data({"type": "state", "state": state})
             }
         } else if (e.keyCode === 37) { // LEFT
             if (currentstate > 0){
@@ -78,6 +119,7 @@ $(document).ready(function () {
             let new_mapstate = mapstates[currentmapstate].slice();
             new_mapstate[mcodes.indexOf(e.keyCode)] += 1;
             mapstates.push(new_mapstate);
+            send_data({"type": "mapstate", "mapstate": new_mapstate})
             currentmapstate = mapstates.length -1;
             localStorage.maps = JSON.stringify(mapstates);
         } else if (e.keyCode === 109 || e.keyCode === 189) { // num.minus
@@ -103,6 +145,7 @@ $(document).ready(function () {
                 let new_mapstate = mapstates[currentmapstate].slice();
                 new_mapstate[c * 4 + m] += 1;
                 mapstates.push(new_mapstate);
+                send_data({"type": "mapstate", "mapstate": new_mapstate})
                 currentmapstate = mapstates.length -1;
                 localStorage.maps = JSON.stringify(mapstates);
             }
@@ -111,6 +154,10 @@ $(document).ready(function () {
         draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
     });
 });
+
+
+
+
 
 function generate_maps(maps) {
     let mapdict = {};
@@ -152,7 +199,7 @@ function generate_players(players) {
             '<div class="stats">' +
             '<img src="images/icons/win.png"><div class="wins"></div>' +
             '<img src="images/icons/plays.png"><div class="plays"></div>' +
-            '<img class="playslineico" src="images/icons/playsline.png"><div class="playsline playslineico"></div>' +
+            '<div class="playslineico"><img src="images/icons/playsline.png"><div class="playsline"></div></div>' +
             '</div>' +
             '</div>' +
             '</div>' +
@@ -236,7 +283,7 @@ function draw_state(state, controllers, mapstate, maplist) {
         $('#p' + i +' > .character').css({"-webkit-transform":"translate("+left+",0px)"});
         $('#p' + i +' > div > div > .stats > .wins').html(state.wins[i]);
         $('#p' + i +' > div > div > .stats > .plays').html(state.plays[i]);
-        $('#p' + i +' > div > div > .stats > .playsline').html(state.playsline[i]);
+        $('#p' + i +' > div > div > .stats > .playslineico > .playsline').html(state.playsline[i]);
         if (state.line[i] < controllers){
             $('#p' + i +' > .character > img').addClass('driving');
             $('#p' + i +' > .character > .driving').css('animation-delay', '-0.' + i +'s');

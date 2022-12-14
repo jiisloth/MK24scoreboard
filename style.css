@@ -14,6 +14,82 @@ body, html{
     position: relative;
 }
 
+.controller_holder{
+    width: 60%;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    bottom: 0;
+    justify-content: space-around;
+}
+.controller_holder > img{
+    width: 25px;
+    height: 27px;
+}
+#cam{
+    position: relative;
+    height: 240px;
+    display: none
+}
+#textheader{
+    background: #3831b1;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    height: 64px;
+    justify-content: space-between;
+}
+#textheader > div {
+    text-align: center;
+    width: 50%;
+    padding-top: 5px
+}
+
+.cam_header{
+    background: #3831b1;
+    width: 40%;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    padding-top: 5px
+}
+.gamearea{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.gamearea > div {
+    position: absolute;
+    padding: 0 5px;
+}
+.gamearea > div > img {
+    margin-bottom: -30px;
+    display: inline-block
+}
+.gamearea > div > div {
+    padding: 0 10px;
+    display: inline-block
+}
+#playername1{
+    top:0
+}
+#playername2{
+    top:0;
+    right: 0
+}
+#playername3{
+    top: 50%;
+    bottom: 0
+}
+#playername4{
+    top: 50%;
+    right: 0
+}
+.played{
+    font-size: 20px
+}
+
 .winner{
 	filter: drop-shadow(1px 1px 0 rgba(255, 230, 0, 0.5))
             drop-shadow(1px -1px 0 rgba(255, 230, 0, 0.5))
@@ -75,6 +151,8 @@ body, html{
     box-sizing: border-box;
     height: 100%;
     position: absolute;
+    top: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -138,6 +216,7 @@ body, html{
     justify-content: center;
 }
 
+
 .character{
     z-index: 10;
     margin-top: -10px;
@@ -151,11 +230,37 @@ body, html{
 .special2{
     z-index: 100;
 }
+.name_special{
+    display: inline-block;
+    background: url("images/icons/special2.png");
+    width: 28px;
+    height: 18px;
+    color: #ffffff;
+    padding-top: 8px;
+    text-align: center;
+    margin-right: -5px;
+    text-shadow: 1px 1px #000000, -1px 1px #000000, 1px -1px #000000, -1px -1px #000000, 1px 0 black, 0 1px black, -1px 0 black, 0 -1px black;
+
+}
+.special_holder{
+    padding-left: 20px;
+    display: inline-block;
+    margin-top: -20px;
+}
+.info .name{
+    display: inline-block;
+}
+
 .wins, .plays, .playsline{
     display: inline-block;
     width: 30px;
     margin-left: 3px;
     font-size: 24px;
+    text-align: right;
+    padding-right: 6px
+}
+.playslineico{
+    display:inline-block;
 }
 .name{
     font-size: 32px;
@@ -166,7 +271,7 @@ body, html{
 .goal{
     background-color: rgba(125, 255, 5, 0.39);
 }
-.dnf{
+.dnf div{
     filter: grayscale(100%);
 }
 .driving {
@@ -182,6 +287,10 @@ body, html{
     margin-left: 16px;
 }
 
+.labeltxt{
+    padding: 0 10px;
+    display: none;
+}
 
 @keyframes drive {
     0% { transform: translate(0px, 0px) rotate(0deg); }

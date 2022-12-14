@@ -1,16 +1,19 @@
 $(document).ready(function () {
     // INIT
     $('#start_menu').show();
+    $('.is_layout').hide()
+    $('.is_cam').hide()
 
     // Menu actions
-    const start_menu = [['new_game'], ['load_cookies'], ['load_file']];
+    const start_menu = [['new_game'], ['load_cookies'], ['spectate']];
     const game_menu = [['input_rounds'], ['input_players'], ['input_controllers'], ['input_shuffle'], ['game_menu_next', 'game_menu_back']];
+    const spectate_menu = [['spectate_menu_next', 'spectate_menu_back']];
     let player_menu = [['input_nick'], ['player_menu_next', 'player_menu_back']];
 
     const playericons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad',
         'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette',
         'bowsette2'];
-    const specialicons = ['zerotwo', 'megaman', 'barret', 'kratos', 'Nyan'];
+    const specialicons = ['misato2', 'misato', 'zerotwo', 'zerotwotwo', 'megaman', 'barret', 'kratos', 'Nyan', 'geralt'];
 
     player_menu = create_icon_buttons(playericons,specialicons, player_menu);
 
@@ -22,6 +25,23 @@ $(document).ready(function () {
     let current_link_col = 0;
     let button_holder = 0;
     update_menu(current_menu, current_link_row, current_link_col);
+
+    $('#spec_layout').change(function() {
+        if(this.checked) {
+            $('.is_layout').show()
+        } else {
+            $('.is_layout').hide()
+        }
+    });
+    $('input[type=radio][name=spec_header]').change(function() {
+        if (this.value == 'cam') {
+            $('.is_cam').show()
+        } else {
+            $('.is_cam').hide()
+
+        }
+    });
+
     $('.menu_item').mouseover(function () {
         for (let i = 0; i < current_menu.length; i++) {
             let col = current_menu[i].indexOf(this.id);
@@ -111,6 +131,9 @@ $(document).ready(function () {
     $('#new_game').click(function () {
         update_tab($('#game_menu'), game_menu)
     });
+    $('#spectate').click(function () {
+        update_tab($('#spectate_menu'), spectate_menu)
+    });
     $('#load_cookies').click(function () {
         window.location.href = 'scoreboard.html?load=cookie'
     });
@@ -127,6 +150,12 @@ $(document).ready(function () {
     });
     $('#game_menu_back').click(function () {
         update_tab($('#start_menu'), start_menu)
+    });
+    $('#spectate_menu_back').click(function () {
+        update_tab($('#start_menu'), start_menu)
+    });
+    $('#spectate_menu_next').click(function () {
+        start_spectator_mode()
     });
     $('.icon').click(function () {
         if (!$(this).hasClass('gone') && !$(this).hasClass('mystery')) {
@@ -156,6 +185,9 @@ $(document).ready(function () {
             }
             if (current === 'load_cookie') {
                 window.location.href = 'scoreboard.html?load=cookie'
+            }
+            if (current === 'spectate') {
+                update_tab($('#spectate_menu'), spectate_menu)
             }
             if (current === 'input_shuffle') {
                 let shuffle = $('#input_shuffle');
@@ -241,16 +273,21 @@ $(document).ready(function () {
         const name = $('#input_nick').val();
         $('.special:not(.gone)').addClass('mystery').removeClass('selected');
 
-        if (name === 'jsloth' || name === 'slotti'){
+        if (name.toLowerCase() === 'jsloth' || name.toLowerCase() === 'slotti'){
             $('#icon_zerotwo').removeClass('mystery')
-        } else if (name === 'Kannadan') {
+            $('#icon_zerotwotwo').removeClass('mystery')
+            $('#icon_misato').removeClass('mystery')
+            $('#icon_misato2').removeClass('mystery')
+        } else if (name.toLowerCase() === 'kannadan') {
             $('#icon_kratos').removeClass('mystery')
-        } else if (name === 'Mega_Tron') {
+        } else if (name.toLowerCase() === 'mega_tron' || name.toLowerCase() === 'megatron') {
             $('#icon_megaman').removeClass('mystery')
-        } else if (name === 'ssarste') {
+        } else if (name.toLowerCase() === 'ssarste') {
             $('#icon_barret').removeClass('mystery')
-        } else if (name === 'muikea') {
+        } else if (name.toLowerCase() === 'muikea') {
             $('#icon_Nyan').removeClass('mystery')
+        } else if (name.toLowerCase() === 'veliboi') {
+            $('#icon_geralt').removeClass('mystery')
         }
     }
     function start_scoreboard(load) {
@@ -336,4 +373,28 @@ function shuffle(array) {
   }
 
   return array;
+}
+
+function start_spectator_mode(){
+    let args = "?"
+    args += "code=" + $('#spec_code').val()
+    if ($('#spec_layout').is(':checked')){
+        args += "&layout=stream";
+        if (!$('#spec_bg').is(':checked')){
+            args += "&bg=false";
+        }
+        if ($('input[name="spec_header"]:checked').val() !== "no"){
+            args += "&header="+ $('input[name="spec_header"]:checked').val()
+        }
+        if ($('input[name="spec_header"]:checked').val() === "cam"){
+            if (!$('#spec_cam_controllers').is(':checked')){
+                args += "&controllers=false";
+            }
+        }
+    }
+    if ($('input[name="spec_sort"]:checked').val() !== "no"){
+        args += "&sort="+ $('input[name="spec_sort"]:checked').val()
+    }
+    window.location.href = 'spectate.html'+args
+
 }

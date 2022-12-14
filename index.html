@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="settings.css?v=5.1">
     <script src="jquery-3.1.1.js?v=1"></script>
-    <script src="settings.js?v=1"></script>
+    <script src="settings.js?v=5.2"></script>
     <title></title>
 </head>
 <body>
@@ -19,7 +19,7 @@
                     <div id="load_cookies" class="menu_link menu_item">Load From Cookies</div>
                 </div>
                 <div class="menu_single">
-                    <div id="load_file" class="menu_link menu_item disabled">Load From File</div>
+                    <div id="spectate" class="menu_link menu_item">Spectate</div>
                 </div>
             </div>
         </div>
@@ -70,6 +70,69 @@
                     </div>
                     <div id="player_menu_next" class="menu_link menu_item disabled">
                         Next
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="spectate_menu" class="menu_tab">
+            <div class="menu_items">
+                <div class="menu_row">
+                    <label for="spec_code">Gamecode:</label><input class="menu_item" id="spec_code" type="text">
+                </div>
+                <div class="menu_row">
+                    <label for="spec_layout">Use stream layout:</label><input class="menu_item" id="spec_layout" type="checkbox">
+                </div>
+                <div class="menu_row is_layout">
+                    <label for="spec_bg">> Use background:</label><input class="menu_item" id="spec_bg" type="checkbox" checked>
+                </div>
+
+                <div class="menu_row is_layout">
+                    <label>> Header type:</label>
+                </div>
+                <div class="menu_row is_layout">
+                    <label for="spec_header_no">> no header:</label>
+                    <input class="menu_item" id="spec_header_no" name="spec_header" type="radio" checked value="no">
+                </div>
+                <div class="menu_row is_layout">
+                    <label for="spec_header_cam">> cam:</label>
+                    <input class="menu_item" id="spec_header_cam" name="spec_header" type="radio" value="cam">
+                </div>
+                <div class="menu_row is_layout">
+                    <label for="spec_header_text">> text:</label>
+                    <input class="menu_item" id="spec_header_text" name="spec_header" type="radio" value="text">
+                </div>
+                <div class="menu_row is_layout">
+                    <label for="spec_header_emptys">> small empty:</label>
+                    <input class="menu_item" id="spec_header_emptys" name="spec_header" type="radio" value="empty-small">
+                </div>
+                <div class="menu_row is_layout">
+                    <label for="spec_header_emptyb">> big empty:</label>
+                    <input class="menu_item" id="spec_header_emptyb" name="spec_header" type="radio" value="empty-big">
+                </div>
+                <div class="menu_row is_cam">
+                    <label for="spec_cam_controllers">>> CTRLlers on cam:</label><input class="menu_item" id="spec_cam_controllers" type="checkbox" checked>
+                </div>
+                <div class="menu_row">
+                    <label>Sort players:</label>
+                </div>
+                <div class="menu_row">
+                    <label for="spec_sort_no">no sort:</label>
+                    <input class="menu_item" id="spec_sort_no" name="spec_sort" type="radio" checked value="no">
+                </div>
+                <div class="menu_row">
+                    <label for="spec_sort_wins">wins:</label>
+                    <input class="menu_item" id="spec_sort_wins" name="spec_sort" type="radio" value="wins">
+                </div>
+                <div class="menu_row">
+                    <label for="spec_sort_que">queue:</label>
+                    <input class="menu_item" id="spec_sort_que" name="spec_sort" type="radio" value="que">
+                </div>
+                <div class="menu_row">
+                    <div id="spectate_menu_back" class="menu_link menu_item">
+                        Back
+                    </div>
+                    <div id="spectate_menu_next" class="menu_link menu_item">
+                        Start
                     </div>
                 </div>
             </div>
