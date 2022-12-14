@@ -166,6 +166,46 @@ body, html{
     justify-content: stretch;
     flex-wrap: nowrap;
 }
+#nani{
+    color: #7c7b06;
+    font-size: 48px;
+    margin-top: 40px;
+}
+#howto{
+    font-size: 28px;
+    color: white;
+    display: none;
+    position: absolute;
+    width: 800px;
+    margin-left: -400px;
+    margin-top: -60px;
+    background-color: #3831b1;
+    z-index: 100;
+    padding: 20px;
+}
+#nani:hover #howto{
+    display: block;
+}
+.howtolist{
+    display: block;
+    font-size: 24px;
+    line-height: 20px;
+}
+.howtobutton{
+    color: #fff87f;
+}
+.howtolistbutton{
+    width: 20px;
+    display: inline-block;
+    text-align: center;
+    color: #fff87f;
+}
+#gamecode{
+    text-align: right;
+    float: right;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.58);
+}
 .round {
     flex-grow: 1;
     flex-basis: 0;
