@@ -1,7 +1,7 @@
 const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire'];
 
 
-const socket = new WebSocket('wss://mk24.hellokopter.com:443');
+const socket = new WebSocket('wss://mk24.jsloth.fi:443');
 
 let secret
 let layout = "normal"
