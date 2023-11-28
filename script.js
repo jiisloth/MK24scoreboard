@@ -1,6 +1,6 @@
 const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire'];
 
-const socket = new WebSocket('wss://mk24.jsloth.com:443');
+const socket = new WebSocket('wss://mk24.jsloth.fi:443');
 let is_online = false
 let gamecode = ""
 // Connection opened
