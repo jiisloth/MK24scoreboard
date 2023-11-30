@@ -148,7 +148,7 @@ function set_layout(){
     $('#textheader').hide()
     $('.gamearea').hide()
     if (layout === "stream"){
-        $('#scoreboard').addClass("spectate")
+        $('#scoreboard').addClass("streamlayout")
         $('body').css('background', 'transparent');
         $('html').css('background', 'transparent');
         $('.cup_holder').hide();
@@ -253,7 +253,10 @@ function generate_players(players) {
             '<div class="stats">' +
             '<img src="images/icons/win.png"><div class="labeltxt">Voitot: </div><div class="wins"></div><div class="winspercent"></div>' +
             '<img src="images/icons/plays.png"><div class="labeltxt">Pelit: </div><div class="plays"></div>' +
-            '<div class="playslineico"><img src="images/icons/playsline.png"><div class="labeltxt">Sohvalla: </div><div class="playsline"></div><div class="playspb"></div></div>' +
+            '<div class="playslinehover">' +
+            '<div class="playslineico"><img class="lineimg" src="images/icons/playsline.png"><div class="labeltxt">Sohvalla: </div><div class="playsline"></div><div class="extraplaysline">PB:<div class="playspb"></div></div></div>' +
+            '<div class="playslinepbico"><img class="linepbimg" src="images/icons/playsline.png"><div class="labeltxt">Sohva PB: </div><div class="playspb"></div></div>' +
+            '</div>' +
             '</div>' +
             '</div>' +
             '</div>' +
@@ -296,6 +299,7 @@ function init_state(players, controllers) {
     let wins = [];
     let plays = [];
     let playsline = [];
+    let playspb = [];
     let line = [];
     let dnf = [];
     let spes = [];
@@ -304,6 +308,7 @@ function init_state(players, controllers) {
         wins.push(0);
         plays.push(0);
         playsline.push(0);
+        playspb.push(0);
         if (p < controllers){
             line.push(consuf[p]);
         } else {
@@ -312,7 +317,7 @@ function init_state(players, controllers) {
         spes.push("");
         dnf.push(false)
     }
-    return {wins: wins, plays:plays, playsline:playsline, line:line, dnf:dnf, spes:spes}
+    return {wins: wins, plays:plays, playsline:playsline, playspb:playspb, line:line, dnf:dnf, spes:spes}
 }
 
 function init_mapstate() {
@@ -324,6 +329,7 @@ function add_state(state) {
         wins: state.wins.slice(),
         plays: state.plays.slice(),
         playsline: state.playsline.slice(),
+        playspb: state.playspb.slice(),
         line: state.line.slice(),
         spes: state.spes.slice(),
         dnf: state.dnf.slice()
@@ -409,14 +415,19 @@ function draw_state(state, controllers, mapstate, maplist) {
             $('#p' + i + ' > div > div > .stats > .winspercent').html(Math.round(state.wins[i] / state.plays[i] * 100)+"%");
         }
         $('#p' + i +' > div > div > .stats > .plays').html(state.plays[i]);
-        $('#p' + i +' > div > div > .stats > .playslineico > .playsline').html(state.playsline[i]);
-        $('#p' + i +' > div > div > .stats > .playslineico > .playspb').html(state.playspb[i]);
+        $('#p' + i +' > div > div > .stats > .playslinehover > .playslineico > .playsline').html(state.playsline[i]);
+        $('#p' + i +' > div > div > .stats > .playslinehover > .playslineico > .extraplaysline > .playspb').html(state.playspb[i]);
+        $('#p' + i +' > div > div > .stats > .playslinehover > .playslinepbico > .playspb').html(state.playspb[i]);
         if (state.line[i] < controllers){
             $('#p' + i +' > .character > img').addClass('driving');
             $('#p' + i +' > .character > .driving').css('animation-delay', '-0.' + i +'s');
             $('#p' + i +' > .line').html('<img src="images/icons/player' + (state.line[i] + 1) + '.png"/>');
-            $('#p' + i +' > div > div > .stats > .playslineico  > .lineimg').show();
-            $('#p' + i +' > div > div > .stats > .playslineico  > .playsline').show();
+
+            $('#p' + i +' > div > div > .stats > .playslinehover > .playslineico').show()
+            if (layout === "stream"){
+                $('#p' + i +' > div > div > .stats > .playslinehover > .playslinepbico').hide()
+
+            }
             if (i !== jonne && state.wins[i] === 0 ){
                 jonne_active = 0
             }
@@ -428,8 +439,11 @@ function draw_state(state, controllers, mapstate, maplist) {
             $('#playername' + (state.line[i]+1) +' > .name').html(settings.players[i][0]);
         } else {
             $('#p' + i +' > .line').html((state.line[i] - controllers + 1) + ".");
-            $('#p' + i +' > div > div > .stats > .playslineico > .lineimg').hide()
-            $('#p' + i +' > div > div > .stats > .playslineico > .playsline').hide()
+            $('#p' + i +' > div > div > .stats > .playslinehover > .playslineico').hide()
+            if (layout === "stream"){
+                $('#p' + i +' > div > div > .stats > .playslinehover > .playslinepbico').show()
+
+            }
         }
         if (state.dnf[i]){
             $('#p' +  i).addClass('dnf');

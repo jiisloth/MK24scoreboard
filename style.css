@@ -293,9 +293,9 @@ body, html{
     text-align: center;
     position: absolute;
     color: #827ab4;
-    opacity: 0.5;
+    opacity: 0;
     text-shadow: 2px 2px #000000, -2px 2px #000000, 2px -2px #000000, -2px -2px #000000, 2px 0 black, 0 2px black, -2px 0 black, 0 -2px black;
-    transition: transform 0.6s ease-out;
+    transition: transform 0.6s ease-out, opacity 0.6s ease-in-out;
 }
 .playerkeyhelp{
     z-index: 0;
@@ -306,9 +306,9 @@ body, html{
     position: absolute;
     white-space: nowrap;
     color: #827ab4;
-    opacity: 0.5;
+    opacity: 0;
     text-shadow: 2px 2px #000000, -2px 2px #000000, 2px -2px #000000, -2px -2px #000000, 2px 0 black, 0 2px black, -2px 0 black, 0 -2px black;
-    transition: transform 0.6s ease-out;
+    transition: transform 0.6s ease-out, opacity 0.6s ease-in-out;
 }
 .hidehelp .playerkey, .hidehelp .playerkeyhelp, .hidehelp .mapkey{
     display: none;
@@ -357,42 +357,54 @@ body, html{
     color: #191036;
     font-size: 16px;
 }
-.spectate .winspercent{
+.streamlayout .winspercent{
     margin-left: 2px;
     margin-right: 5px;
     color: #191036;
     font-size: 16px;
 }
-.spectate .plays{
+.streamlayout .plays{
     margin-right: 12px;
 }
-.spectate .player{
+.streamlayout .player{
     margin-left: 10px;
 }
 .playspb{
-    display: none;
     text-shadow: 1px 0 #fdf77f, 0 1px #fdf77f, -1px 0 #fdf77f, 0 -1px #fdf77f;
 }
-.playslineico:hover .lineimg{
-    display: none;
-}
 .linepbimg{
-    display: none;
-}
-.playslineico:hover .linepbimg{
-    display: inline-block;
     filter: grayscale(90%);
 }
-.playslineico:hover .playsline{
+.playslinepbico {
     display: none;
 }
-.playslineico:hover .playspb{
+.playslinehover:hover .playslineico{
+    display: none;
+}
+.playslinehover:hover .playslinepbico{
     display: inline-block;
 }
-.playslineico{
+
+.playslinehover{
     min-width: 30px;
     min-height: 50%;
     display:inline-block;
+}
+.extraplaysline{
+    display: none;
+}
+.streamlayout .extraplaysline{
+    display: inline-block;
+    margin-left: 10px;
+}
+.streamlayout .playslinehover:hover .playslineico{
+    display: inline-block;
+}
+.streamlayout .playslinehover:hover .playslinepbico{
+    display: none;
+}
+.spectate .playspb{
+    text-shadow: none;
 }
 .name{
     font-size: 32px;

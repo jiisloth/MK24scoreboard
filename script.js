@@ -221,14 +221,17 @@ function generate_players(players, playerkeys) {
             '<div class="stats">' +
             '<img src="images/icons/win.png"><div class="wins"></div><div class="winspercent"></div>' +
             '<img src="images/icons/plays.png"><div class="plays"></div>' +
-            '<div class="playslineico"><img class="lineimg" src="images/icons/playsline.png"><img class="linepbimg" src="images/icons/playsline.png"><div class="playsline"></div><div class="playspb"></div></div>' +
+            '<div class="playslinehover">' +
+            '<div class="playslineico"><img class="lineimg" src="images/icons/playsline.png"><div class="playsline"></div></div>' +
+            '<div class="playslinepbico"><img class="linepbimg" src="images/icons/playsline.png"><div class="playspb"></div></div>' +
+            '</div>' +
             '</div>' +
             '</div>' +
             '</div>' +
             '<div class="character">' +
                 '<img ' + gold + ' src="images/playerIcons/' + players[p][1] + '.png">' +
             '</div>' +
-            '<div class="playerkeyhelp">Jos voitit, paina:</div>' +
+            '<div class="playerkeyhelp">If win, press:</div>' +
             '<div class="playerkey">'+playerkeys[p]+'</div>' +
             '</div>')
         $('#howtoplayers').append('<span class="howtolistbutton">' + playernumbers[p] + '</span> - ' + players[p][0] + '<br>')
@@ -238,11 +241,12 @@ function generate_players(players, playerkeys) {
         const helptextpos = width + (leftoffset) + "px";
         $('#p' + p + ' > .playerkey').css({
             "-webkit-transform": "translate(" + helppos + ",0px)",
-            "width": "" + width + "px"
-        }).hide()
+            "width": "" + width + "px",
+            "opacity": "0.2"
+        })
         $('#p' + p + ' > .playerkeyhelp').css({
             "-webkit-transform": "translate(" + helptextpos + ",0px)",
-        }).hide()
+        })
     }
 }
 
@@ -330,30 +334,31 @@ function draw_state(state, controllers, mapstate, maplist) {
             if (state.wins[i] === 0) {
                 key.css({
                     "-webkit-transform": "translate(" + helppos + ",0px)",
-                    "width": "" + width + "px"
+                    "width": "" + width + "px",
+                    "opacity": "0.6"
                 });
                 keyhelp.css({
                     "-webkit-transform": "translate(" + helptextpos + ",0px)",
-                    "-webkit-transition": "opacity 0.6s ease-out",
                     "opacity": "0.5"
-                }).show()
+                })
             } else {
                 key.css({
-                    "-webkit-transform": "translate(" + leftoffset + "px,0px)"
+                    "-webkit-transform": "translate(" + leftoffset + "px,0px)",
+                    "opacity": "0.6"
                 });
             }
             key.show()
         } else {
             if (state.wins[i] > 0) {
                 key.css({
-                    "-webkit-transform": "translate(" + leftoffset + "px,0px)"
+                    "-webkit-transform": "translate(" + leftoffset + "px,0px)",
+                    "opacity": "0.2"
                 });
             } else {
                 key.hide()
                 keyhelp.hide()
             }
             keyhelp.css({
-                "-webkit-transition": "opacity 0.6s ease-out",
                 "opacity": "0.0"
             })
 
@@ -363,14 +368,14 @@ function draw_state(state, controllers, mapstate, maplist) {
             $('#p' + i + ' > div > div > .stats > .winspercent').html(Math.round(state.wins[i] / state.plays[i] * 100)+"%");
         }
         $('#p' + i +' > div > div > .stats > .plays').html(state.plays[i]);
-        $('#p' + i +' > div > div > .stats > .playslineico > .playsline').html(state.playsline[i]);
-        $('#p' + i +' > div > div > .stats > .playslineico > .playspb').html(state.playspb[i]);
+        $('#p' + i +' > div > div > .stats > .playslinehover > .playslineico > .playsline').html(state.playsline[i]);
+        $('#p' + i +' > div > div > .stats > .playslinehover > .playslinepbico > .playspb').html(state.playspb[i]);
         if (state.line[i] < controllers){
             $('#p' + i +' > .character > img').addClass('driving');
             $('#p' + i +' > .character > .driving').css('animation-delay', '-0.' + i +'s');
             $('#p' + i +' > .line').html('<img src="images/icons/player' + (state.line[i] + 1) + '.png"/>');
-            $('#p' + i +' > div > div > .stats > .playslineico > .lineimg').show();
-            $('#p' + i +' > div > div > .stats > .playslineico > .playsline').show()
+
+            $('#p' + i +' > div > div > .stats > .playslinehover > .playslineico').show()
             if (i !== jonne && state.wins[i] === 0 ){
                 jonne_active = 0
             }
@@ -380,8 +385,7 @@ function draw_state(state, controllers, mapstate, maplist) {
 
         } else {
             $('#p' + i +' > .line').html((state.line[i] - controllers + 1) + ".");
-            $('#p' + i +' > div > div > .stats > .playslineico > .lineimg').hide()
-            $('#p' + i +' > div > div > .stats > .playslineico > .playsline').hide()
+            $('#p' + i +' > div > div > .stats > .playslinehover > .playslineico').hide()
         }
         if (state.dnf[i]){
             $('#p' +  i).addClass('dnf');
