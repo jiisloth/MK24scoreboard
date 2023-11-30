@@ -395,7 +395,7 @@ function draw_state(state, controllers, mapstate, maplist) {
     let order = get_order(state)
     let leftoffset = 294
     if (layout === "stream") {
-        leftoffset = 0
+        leftoffset = -15
     }
     if (sort){
         sort_board(order);
