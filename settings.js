@@ -13,7 +13,7 @@ $(document).ready(function () {
     const playericons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad',
         'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette',
         'bowsette2'];
-    const specialicons = ['misato2', 'misato', 'zerotwo', 'zerotwotwo', 'megaman', 'barret', 'kratos', 'hiire', 'Nyan', 'geralt'];
+    const specialicons = ['misato2', 'misato', 'zerotwo', 'zerotwotwo', 'megaman', 'barret', 'kratos', 'hiire', 'Nyan', 'geralt', 'luffy'];
 
     player_menu = create_icon_buttons(playericons,specialicons, player_menu);
 
@@ -282,6 +282,7 @@ $(document).ready(function () {
         } else if (name.toLowerCase() === 'kannadan') {
             $('#icon_kratos').removeClass('mystery')
             $('#icon_hiire').removeClass('mystery')
+            $('#icon_luffy').removeClass('mystery')
         } else if (name.toLowerCase() === 'mega_tron' || name.toLowerCase() === 'megatron') {
             $('#icon_megaman').removeClass('mystery')
         } else if (name.toLowerCase() === 'ssarste') {
