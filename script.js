@@ -68,9 +68,15 @@ $(document).ready(function () {
         ['MushroomBridge', 'MarioCircuit', 'DaisyCruiser', 'WaluigiStadium'],
         ['SherbetLand', 'MushroomCity', 'YoshiCircuit', 'DKMountain'],
         ['WarioColosseum', 'DinoDinoJungle', 'BowserCastle', 'RainbowRoad']];
-    const mapdict = generate_maps(maps); // Could use this instead of counting..
+    const mapkeys = [
+        ['A', 'S', 'D', 'F'],
+        ['G', 'H', 'J', 'K'],
+        ['Z', 'X', 'C', 'V'],
+        ['B', 'N', 'M', ',']];
+    const playerkeys = ['1','2','3','4','5','6','7','8','9','0','Q','W','E','R','T','Y','U','I','O','P']
+    const mapdict = generate_maps(maps, mapkeys); // Could use this instead of counting..
     generate_rounds(settings.rounds);
-    generate_players(settings.players);
+    generate_players(settings.players, playerkeys);
     draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
 
     $(document).keydown(function (e) {
@@ -115,6 +121,11 @@ $(document).ready(function () {
             if (currentstate < states.length-1){
                 currentstate += 1;
                             }
+        }
+        else if (e.keyCode === 9) { // TAB
+            e.preventDefault()
+            $('#scoreboard').toggleClass("hidehelp")
+
         }
         else if (mcodes.indexOf(e.keyCode) < mapstates[currentmapstate].length && mcodes.indexOf(e.keyCode) >= 0){
             if (currentmapstate !== mapstates.length-1){
@@ -166,13 +177,14 @@ $(document).ready(function () {
 
 
 
-function generate_maps(maps) {
+function generate_maps(maps, mapkeys) {
     let mapdict = {};
     for (let cup = 0; cup < maps.length; cup++){
         for (let map = 0; map < maps[cup].length; map ++){
             $('#cup_' + (cup + 1)).append('<div id="' + maps[cup][map] + '" class="map">' +
                 '<img src="images/maps/' + maps[cup][map] + '.png">' +
                 '<div class="mapcount">mapcount</div>' +
+                '<div class="mapkey">' + mapkeys[cup][map] + '</div>' +
                 '</div>');
             mapdict[maps[cup][map]] = (cup + 1) * (map + 1);
         }
@@ -188,7 +200,8 @@ function generate_rounds(rounds) {
     $('#rounds').append('<div class="round goal"><img src="images/icons/lastLap.png"></div>')
 }
 
-function generate_players(players) {
+function generate_players(players, playerkeys) {
+    const width = $('.round').width();
     $('#players').html("");
     for (let p = 0; p < players.length; p ++){
         let gold = ""
@@ -200,21 +213,36 @@ function generate_players(players) {
             p + '.' +
             '</div>' +
             '<div class="info">' +
-            '<div><img class="info_char" src="images/playerIcons/' + players[p][1] + '.png"/></div>' +
+            '<div><img class="info_char" src="images/playerIcons/' + players[p][1] + '.png"/>' +
+
+            '</div>' +
             '<div>' +
             '<div class="name">' + players[p][0] + '</div>' +
             '<div class="stats">' +
-            '<img src="images/icons/win.png"><div class="wins"></div>' +
+            '<img src="images/icons/win.png"><div class="wins"></div><div class="winspercent"></div>' +
             '<img src="images/icons/plays.png"><div class="plays"></div>' +
-            '<div class="playslineico"><img src="images/icons/playsline.png"><div class="playsline"></div></div>' +
+            '<div class="playslineico"><img class="lineimg" src="images/icons/playsline.png"><img class="linepbimg" src="images/icons/playsline.png"><div class="playsline"></div><div class="playspb"></div></div>' +
             '</div>' +
             '</div>' +
             '</div>' +
             '<div class="character">' +
                 '<img ' + gold + ' src="images/playerIcons/' + players[p][1] + '.png">' +
             '</div>' +
+            '<div class="playerkeyhelp">Jos voitit, paina:</div>' +
+            '<div class="playerkey">'+playerkeys[p]+'</div>' +
             '</div>')
         $('#howtoplayers').append('<span class="howtolistbutton">' + playernumbers[p] + '</span> - ' + players[p][0] + '<br>')
+        const helpwidth = $('.playerkeyhelp').width();
+        let leftoffset = 294
+        const helppos = Math.ceil(helpwidth/width)*width +width + leftoffset + "px";
+        const helptextpos = width + (leftoffset) + "px";
+        $('#p' + p + ' > .playerkey').css({
+            "-webkit-transform": "translate(" + helppos + ",0px)",
+            "width": "" + width + "px"
+        }).hide()
+        $('#p' + p + ' > .playerkeyhelp').css({
+            "-webkit-transform": "translate(" + helptextpos + ",0px)",
+        }).hide()
     }
 }
 
@@ -245,6 +273,7 @@ function init_state(players, controllers) {
     let wins = [];
     let plays = [];
     let playsline = [];
+    let playspb = [];
     let line = [];
     let dnf = [];
     let spes = [];
@@ -253,6 +282,7 @@ function init_state(players, controllers) {
         wins.push(0);
         plays.push(0);
         playsline.push(0);
+        playspb.push(0);
         if (p < controllers){
             line.push(consuf[p]);
         } else {
@@ -261,7 +291,7 @@ function init_state(players, controllers) {
         spes.push("");
         dnf.push(false)
     }
-    return {wins: wins, plays:plays, playsline:playsline, line:line, dnf:dnf, spes:spes}
+    return {wins: wins, plays:plays, playsline:playsline, playspb:playspb, line:line, dnf:dnf, spes:spes}
 }
 
 function init_mapstate() {
@@ -273,6 +303,7 @@ function add_state(state) {
         wins: state.wins.slice(),
         plays: state.plays.slice(),
         playsline: state.playsline.slice(),
+        playspb: state.playspb.slice(),
         line: state.line.slice(),
         spes: state.spes.slice(),
         dnf: state.dnf.slice()
@@ -282,21 +313,64 @@ function add_state(state) {
 function draw_state(state, controllers, mapstate, maplist) {
     const jonne = state.playsline.indexOf(Math.max.apply(Math, state.playsline));
     const width = $('.round').width();
+    const helpwidth = $('.playerkeyhelp').width();
+    let leftoffset = 294
+    const helppos = Math.ceil(helpwidth/width)*width +width + leftoffset + "px";
+    const helptextpos = width + (leftoffset) + "px";
     let jonne_active = 1;
     $('.character > img').removeClass('driving');
     $('.player').removeClass('dnf');
     $('.special').remove();
     for (let i = 0; i < state.wins.length; i ++){
-        let left = (195 + (state.wins[i]+1) * width) + "px";
+        let left = ((leftoffset-87) + (state.wins[i]+1) * width) + "px";
         $('#p' + i +' > .character').css({"-webkit-transform":"translate("+left+",0px)"});
+        let key = $('#p' + i + ' > .playerkey')
+        let keyhelp = $('#p' + i + ' > .playerkeyhelp')
+        if (state.line[i] < controllers){
+            if (state.wins[i] === 0) {
+                key.css({
+                    "-webkit-transform": "translate(" + helppos + ",0px)",
+                    "width": "" + width + "px"
+                });
+                keyhelp.css({
+                    "-webkit-transform": "translate(" + helptextpos + ",0px)",
+                    "-webkit-transition": "opacity 0.6s ease-out",
+                    "opacity": "0.5"
+                }).show()
+            } else {
+                key.css({
+                    "-webkit-transform": "translate(" + leftoffset + "px,0px)"
+                });
+            }
+            key.show()
+        } else {
+            if (state.wins[i] > 0) {
+                key.css({
+                    "-webkit-transform": "translate(" + leftoffset + "px,0px)"
+                });
+            } else {
+                key.hide()
+                keyhelp.hide()
+            }
+            keyhelp.css({
+                "-webkit-transition": "opacity 0.6s ease-out",
+                "opacity": "0.0"
+            })
+
+        }
         $('#p' + i +' > div > div > .stats > .wins').html(state.wins[i]);
+        if (state.plays[i] > 0) {
+            $('#p' + i + ' > div > div > .stats > .winspercent').html(Math.round(state.wins[i] / state.plays[i] * 100)+"%");
+        }
         $('#p' + i +' > div > div > .stats > .plays').html(state.plays[i]);
         $('#p' + i +' > div > div > .stats > .playslineico > .playsline').html(state.playsline[i]);
+        $('#p' + i +' > div > div > .stats > .playslineico > .playspb').html(state.playspb[i]);
         if (state.line[i] < controllers){
             $('#p' + i +' > .character > img').addClass('driving');
             $('#p' + i +' > .character > .driving').css('animation-delay', '-0.' + i +'s');
             $('#p' + i +' > .line').html('<img src="images/icons/player' + (state.line[i] + 1) + '.png"/>');
-            $('#p' + i +' > div > div > .stats > .playslineico').show();
+            $('#p' + i +' > div > div > .stats > .playslineico > .lineimg').show();
+            $('#p' + i +' > div > div > .stats > .playslineico > .playsline').show()
             if (i !== jonne && state.wins[i] === 0 ){
                 jonne_active = 0
             }
@@ -306,7 +380,8 @@ function draw_state(state, controllers, mapstate, maplist) {
 
         } else {
             $('#p' + i +' > .line').html((state.line[i] - controllers + 1) + ".");
-            $('#p' + i +' > div > div > .stats > .playslineico').hide()
+            $('#p' + i +' > div > div > .stats > .playslineico > .lineimg').hide()
+            $('#p' + i +' > div > div > .stats > .playslineico > .playsline').hide()
         }
         if (state.dnf[i]){
             $('#p' +  i).addClass('dnf');
@@ -317,9 +392,9 @@ function draw_state(state, controllers, mapstate, maplist) {
         for (let s = 1; s < spes.length; s++){
             $('#p' + i ).append(
                 '<img src="images/icons/special.png" class="special" ' +
-                'style="left:' + (280 + parseInt(spes[s]) * width + width/2 -14)  + 'px">').append(
+                'style="left:' + (leftoffset + parseInt(spes[s]) * width + width/2 -14)  + 'px">').append(
                     '<img src="images/icons/special.png" class="special special2" ' +
-                'style="left:' + (280 + spes[s] * width + width/2 -14)  + 'px">')
+                'style="left:' + (leftoffset + spes[s] * width + width/2 -14)  + 'px">')
         }
     }
     for (let m = 0; m < mapstate.length; m ++){
@@ -335,6 +410,7 @@ function next_round(p, oldstate, s, action) {
     let state = {wins: oldstate.wins.slice(),
         plays: oldstate.plays.slice(),
         playsline: oldstate.playsline.slice(),
+        playspb: oldstate.playspb.slice(),
         line: oldstate.line.slice(),
         spes: oldstate.spes.slice(),
         dnf: oldstate.dnf.slice()};
@@ -346,6 +422,9 @@ function next_round(p, oldstate, s, action) {
             for (let i = 0; i < state.plays.length; i++) {
                 if (state.line[i] < s.controllers) {
                     state.plays[i] += 1;
+                    if (state.playspb[i] === state.playsline[i]){
+                        state.playspb[i] += 1;
+                    }
                     state.playsline[i] += 1;
                 }
             }

@@ -148,6 +148,7 @@ function set_layout(){
     $('#textheader').hide()
     $('.gamearea').hide()
     if (layout === "stream"){
+        $('#scoreboard').addClass("spectate")
         $('body').css('background', 'transparent');
         $('html').css('background', 'transparent');
         $('.cup_holder').hide();
@@ -250,9 +251,9 @@ function generate_players(players) {
             '<div>' +
             '<div><div class="name">' + players[p][0] + '</div><div class="special_holder"></div></div>' +
             '<div class="stats">' +
-            '<img src="images/icons/win.png"><div class="labeltxt">Voitot: </div><div class="wins"></div>' +
+            '<img src="images/icons/win.png"><div class="labeltxt">Voitot: </div><div class="wins"></div><div class="winspercent"></div>' +
             '<img src="images/icons/plays.png"><div class="labeltxt">Pelit: </div><div class="plays"></div>' +
-            '<div class="playslineico"><img src="images/icons/playsline.png"><div class="labeltxt">Sohvalla: </div><div class="playsline"></div></div>' +
+            '<div class="playslineico"><img src="images/icons/playsline.png"><div class="labeltxt">Sohvalla: </div><div class="playsline"></div><div class="playspb"></div></div>' +
             '</div>' +
             '</div>' +
             '</div>' +
@@ -386,7 +387,7 @@ function draw_state(state, controllers, mapstate, maplist) {
     const jonne = state.playsline.indexOf(Math.max.apply(Math, state.playsline));
     const width = $('.round').width();
     let order = get_order(state)
-    let leftoffset = 280
+    let leftoffset = 294
     if (layout === "stream") {
         leftoffset = 0
     }
@@ -398,19 +399,24 @@ function draw_state(state, controllers, mapstate, maplist) {
     $('.player').removeClass('dnf');
     $('.special').remove();
     for (let i = 0; i < state.wins.length; i ++){
-        let left = ((leftoffset-95) + (state.wins[i]+1) * width) + "px";
+        let left = ((leftoffset-87) + (state.wins[i]+1) * width) + "px";
         $('#p' + i +' > .character').css({"-webkit-transform":"translate("+left+",0px)"});
         if (layout === "stream") {
             $('#p' + i + ' > .character').css("z-index", 50 - order.indexOf(i));
         }
-        $('#p' + i +' > div > div > .stats > .wins').html(state.wins[i]);
+        $('#p' + i + ' > div > div > .stats > .wins').html(state.wins[i]);
+        if (state.plays[i] > 0) {
+            $('#p' + i + ' > div > div > .stats > .winspercent').html(Math.round(state.wins[i] / state.plays[i] * 100)+"%");
+        }
         $('#p' + i +' > div > div > .stats > .plays').html(state.plays[i]);
         $('#p' + i +' > div > div > .stats > .playslineico > .playsline').html(state.playsline[i]);
+        $('#p' + i +' > div > div > .stats > .playslineico > .playspb').html(state.playspb[i]);
         if (state.line[i] < controllers){
             $('#p' + i +' > .character > img').addClass('driving');
             $('#p' + i +' > .character > .driving').css('animation-delay', '-0.' + i +'s');
             $('#p' + i +' > .line').html('<img src="images/icons/player' + (state.line[i] + 1) + '.png"/>');
-            $('#p' + i +' > div > div > .stats > .playslineico').show();
+            $('#p' + i +' > div > div > .stats > .playslineico  > .lineimg').show();
+            $('#p' + i +' > div > div > .stats > .playslineico  > .playsline').show();
             if (i !== jonne && state.wins[i] === 0 ){
                 jonne_active = 0
             }
@@ -422,7 +428,8 @@ function draw_state(state, controllers, mapstate, maplist) {
             $('#playername' + (state.line[i]+1) +' > .name').html(settings.players[i][0]);
         } else {
             $('#p' + i +' > .line').html((state.line[i] - controllers + 1) + ".");
-            $('#p' + i +' > div > div > .stats > .playslineico').hide()
+            $('#p' + i +' > div > div > .stats > .playslineico > .lineimg').hide()
+            $('#p' + i +' > div > div > .stats > .playslineico > .playsline').hide()
         }
         if (state.dnf[i]){
             $('#p' +  i).addClass('dnf');
