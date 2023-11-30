@@ -347,7 +347,6 @@ function draw_state(state, controllers, mapstate, maplist) {
                     "opacity": "0.6"
                 });
             }
-            key.show()
         } else {
             if (state.wins[i] > 0) {
                 key.css({
@@ -355,8 +354,9 @@ function draw_state(state, controllers, mapstate, maplist) {
                     "opacity": "0.2"
                 });
             } else {
-                key.hide()
-                keyhelp.hide()
+                key.css({
+                    "opacity": "0"
+                });
             }
             keyhelp.css({
                 "opacity": "0.0"
