@@ -276,6 +276,10 @@ body, html{
     margin-right: 11px;
     z-index: 1;
 }
+.streamlayout .info_char{
+    margin-right: -10px;
+    margin-left: -30px;
+}
 
 .character{
     z-index: 10;
@@ -283,7 +287,10 @@ body, html{
     position: absolute;
     transition: transform 0.6s ease-out;
 }
-
+.character > img {
+    position: absolute;
+    z-index: 10;
+}
 
 .playerkey{
     z-index: 0;
@@ -359,15 +366,25 @@ body, html{
 }
 .streamlayout .winspercent{
     margin-left: 2px;
-    margin-right: 5px;
+    margin-right: 3px;
     color: #191036;
     font-size: 16px;
 }
 .streamlayout .plays{
-    margin-right: 12px;
+    margin-right: 6px;
+    padding: 0px;
+}
+.streamlayout .wins{
+    padding: 0px;
+}
+.streamlayout .playspb{
+    padding: 0px;
+}
+.streamlayout .playsline{
+    padding: 0px;
 }
 .streamlayout .player{
-    margin-left: 10px;
+    margin-left: 5px;
 }
 .playspb{
     text-shadow: 1px 0 #fdf77f, 0 1px #fdf77f, -1px 0 #fdf77f, 0 -1px #fdf77f;
@@ -395,7 +412,7 @@ body, html{
 }
 .streamlayout .extraplaysline{
     display: inline-block;
-    margin-left: 10px;
+    margin-left: 5px;
 }
 .streamlayout .playslinehover:hover .playslineico{
     display: inline-block;
@@ -432,10 +449,47 @@ body, html{
 }
 
 .labeltxt{
-    padding: 0 10px;
+    padding: 0 6px;
     display: none;
 }
 
+
+.fire{
+    width: 100px;
+    height: 100px;
+    position: absolute;
+}
+.fireani{
+    width: 100px;
+    height: 200px;
+    animation: flame 2s steps(32) infinite;
+    top: -105px;
+    left: -22px;
+    position: absolute;
+    padding-top: 50px;
+    transform: scale(0.5) rotate(-25deg);
+    opacity: 0;
+    filter: contrast(0.8);
+    transition: transform 6s ease-out, opacity 2s ease-in-out, padding-top 6s ease-in-out, filter 16s ease-in-out;
+}
+
+.streamlayout .fireani{
+    left: -50px;
+}
+.backfire{
+    background: url("images/misc/flames.png") left center no-repeat;
+    z-index: 0;
+}
+.frontfire{
+    background: url("images/misc/frontflames.png") left center no-repeat;
+    height: 147px;
+    top: -60px;
+    z-index: 200;
+}
+
+@keyframes flame {
+   100% { background-position: -3200px; }
+}
 @keyframes drive {
     0% { transform: translate(0px, 0px) rotate(0deg); }
     10% { transform: translate(0px, -1px) rotate(-1deg); }

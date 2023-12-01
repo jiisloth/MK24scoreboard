@@ -1,4 +1,4 @@
-const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire'];
+const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire', 'luffy'];
 
 const socket = new WebSocket('wss://mk24.jsloth.fi:443');
 let is_online = false
@@ -229,6 +229,10 @@ function generate_players(players, playerkeys) {
             '</div>' +
             '</div>' +
             '<div class="character">' +
+                '<div class="fire">' +
+                    '<div class="backfire fireani"></div>' +
+                    '<div class="frontfire fireani"></div>' +
+                '</div>' +
                 '<img ' + gold + ' src="images/playerIcons/' + players[p][1] + '.png">' +
             '</div>' +
             '<div class="playerkeyhelp">If win, press:</div>' +
@@ -279,6 +283,7 @@ function init_state(players, controllers) {
     let playsline = [];
     let playspb = [];
     let line = [];
+    let fire = [];
     let dnf = [];
     let spes = [];
     const consuf = [0,2,1,3,4,6,5,7];
@@ -287,6 +292,7 @@ function init_state(players, controllers) {
         plays.push(0);
         playsline.push(0);
         playspb.push(0);
+        fire.push(0);
         if (p < controllers){
             line.push(consuf[p]);
         } else {
@@ -295,7 +301,7 @@ function init_state(players, controllers) {
         spes.push("");
         dnf.push(false)
     }
-    return {wins: wins, plays:plays, playsline:playsline, playspb:playspb, line:line, dnf:dnf, spes:spes}
+    return {wins: wins, plays:plays, playsline:playsline, playspb:playspb, line:line, fire:fire, dnf:dnf, spes:spes}
 }
 
 function init_mapstate() {
@@ -309,6 +315,7 @@ function add_state(state) {
         playsline: state.playsline.slice(),
         playspb: state.playspb.slice(),
         line: state.line.slice(),
+        fire: state.fire.slice(),
         spes: state.spes.slice(),
         dnf: state.dnf.slice()
     }
@@ -364,6 +371,17 @@ function draw_state(state, controllers, mapstate, maplist) {
 
         }
         $('#p' + i +' > div > div > .stats > .wins').html(state.wins[i]);
+
+        let fireopacity = Math.min(state.fire[i]/3.0, 1.0)
+        let firesize = Math.min(state.fire[i]/3.0, 1.0)
+        let firecontrast = state.fire[i]/10.0
+        $('#p' + i + ' > .character > .fire > .fireani').css({
+                    "-webkit-transform": "scale("+(0.5+firesize/2.0)+") rotate(-25deg)",
+                    "-webkit-filter": "contrast("+(0.8+firecontrast)+")",
+                    "padding-top": "" + (50-firesize*50) + "px",
+                    "opacity": "" + fireopacity,
+                });
+
         if (state.plays[i] > 0) {
             $('#p' + i + ' > div > div > .stats > .winspercent').html(Math.round(state.wins[i] / state.plays[i] * 100)+"%");
         }
@@ -416,6 +434,7 @@ function next_round(p, oldstate, s, action) {
         playsline: oldstate.playsline.slice(),
         playspb: oldstate.playspb.slice(),
         line: oldstate.line.slice(),
+        fire: oldstate.fire.slice(),
         spes: oldstate.spes.slice(),
         dnf: oldstate.dnf.slice()};
     if (action === 'spes') {
@@ -423,6 +442,9 @@ function next_round(p, oldstate, s, action) {
     } else {
         if (action === 'win') {
             state.wins[p] += 1;
+            if (state.playsline[p] === 0){
+                state.fire[p] += 1;
+            }
             for (let i = 0; i < state.plays.length; i++) {
                 if (state.line[i] < s.controllers) {
                     state.plays[i] += 1;
@@ -430,6 +452,9 @@ function next_round(p, oldstate, s, action) {
                         state.playspb[i] += 1;
                     }
                     state.playsline[i] += 1;
+                    if (i !== p){
+                        state.fire[i] = 0;
+                    }
                 }
             }
         }

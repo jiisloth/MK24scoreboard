@@ -173,7 +173,7 @@ function set_layout(){
         $('#rounds').css('background', '#3831b1');
         $('.labeltxt').css('display', "inline-block")
         $('.round').css('padding-top', "4px")
-        $('.character').css('bottom', "-54px")
+        $('.character').css('bottom', "25px")
         $('.special').css('bottom', "-54px")
         $('.info_char').css('width', "96px")
         $('.info_char').css('height', "72px")
@@ -247,7 +247,13 @@ function generate_players(players) {
             p + '.' +
             '</div>' +
             '<div class="info">' +
-            '<div><img class="info_char" src="images/playerIcons/' + players[p][1] + '.png"/></div>' +
+            '<div>' +
+            '<img class="info_char" src="images/playerIcons/' + players[p][1] + '.png"/>' +
+            '</div>' +
+            '<div class="fire">' +
+                '<div class="backfire fireani"></div>' +
+                '<div class="frontfire fireani"></div>' +
+            '</div>' +
             '<div>' +
             '<div><div class="name">' + players[p][0] + '</div><div class="special_holder"></div></div>' +
             '<div class="stats">' +
@@ -261,6 +267,10 @@ function generate_players(players) {
             '</div>' +
             '</div>' +
             '<div class="character">' +
+                '<div class="fire">' +
+                    '<div class="backfire fireani"></div>' +
+                    '<div class="frontfire fireani"></div>' +
+                '</div>' +
                 '<img ' + gold + ' src="images/playerIcons/' + players[p][1] + '.png">' +
             '</div>' +
             '</div>')
@@ -300,6 +310,7 @@ function init_state(players, controllers) {
     let plays = [];
     let playsline = [];
     let playspb = [];
+    let fire = [];
     let line = [];
     let dnf = [];
     let spes = [];
@@ -309,6 +320,7 @@ function init_state(players, controllers) {
         plays.push(0);
         playsline.push(0);
         playspb.push(0);
+        fire.push(0);
         if (p < controllers){
             line.push(consuf[p]);
         } else {
@@ -317,7 +329,7 @@ function init_state(players, controllers) {
         spes.push("");
         dnf.push(false)
     }
-    return {wins: wins, plays:plays, playsline:playsline, playspb:playspb, line:line, dnf:dnf, spes:spes}
+    return {wins: wins, plays:plays, playsline:playsline, playspb:playspb, fire:fire, line:line, dnf:dnf, spes:spes}
 }
 
 function init_mapstate() {
@@ -329,6 +341,7 @@ function add_state(state) {
         wins: state.wins.slice(),
         plays: state.plays.slice(),
         playsline: state.playsline.slice(),
+        fire: state.fire.slice(),
         playspb: state.playspb.slice(),
         line: state.line.slice(),
         spes: state.spes.slice(),
@@ -411,6 +424,27 @@ function draw_state(state, controllers, mapstate, maplist) {
             $('#p' + i + ' > .character').css("z-index", 50 - order.indexOf(i));
         }
         $('#p' + i + ' > div > div > .stats > .wins').html(state.wins[i]);
+
+        let fireopacity = Math.min(state.fire[i]/3.0, 1.0)
+        let firesize = Math.min(state.fire[i]/3.0, 1.0)
+        let firecontrast = state.fire[i]/10.0
+
+        if (layout === "stream") {
+            $('#p' + i + ' > .info > .fire > .fireani').css({
+                "-webkit-transform": "scale(" + (0.5 + firesize / 2.0) + ") rotate(-25deg)",
+                "-webkit-filter": "contrast(" + (0.8 + firecontrast) + ")",
+                "padding-top": "" + (50 - firesize * 50) + "px",
+                "opacity": "" + fireopacity,
+            });
+        } else {
+            $('#p' + i + ' > .character > .fire > .fireani').css({
+                    "-webkit-transform": "scale("+(0.5+firesize/2.0)+") rotate(-25deg)",
+                    "-webkit-filter": "contrast("+(0.8+firecontrast)+")",
+                    "padding-top": "" + (50-firesize*50) + "px",
+                    "opacity": "" + fireopacity,
+                });
+        }
+
         if (state.plays[i] > 0) {
             $('#p' + i + ' > div > div > .stats > .winspercent').html(Math.round(state.wins[i] / state.plays[i] * 100)+"%");
         }
