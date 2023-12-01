@@ -39,6 +39,7 @@ let currentstate;
 let currentmapstate;
 
 const playernumbers = "1234567890QWERTYUIOP"
+const linecolors = ["#ececf1", "#cfd6e0", "#aec1e1", "#95b1e1", "#7ba1e0", "#6291e0", "#4881df", "#3474df",]
 
 $(document).ready(function () {
     let settings = read_attributes();
@@ -402,7 +403,8 @@ function draw_state(state, controllers, mapstate, maplist) {
             }
 
         } else {
-            $('#p' + i +' > .line').html((state.line[i] - controllers + 1) + ".");
+            let linecid = Math.min(7, state.line[i] - controllers)
+            $('#p' + i +' > .line').html((state.line[i] - controllers + 1) + ".").css({"color": linecolors[linecid]});
             $('#p' + i +' > div > div > .stats > .playslinehover > .playslineico').hide()
         }
         if (state.dnf[i]){
