@@ -373,7 +373,7 @@ function draw_state(state, controllers, mapstate, maplist) {
         }
         $('#p' + i +' > div > div > .stats > .wins').html(state.wins[i]);
 
-        let fireopacity = Math.min(state.fire[i]/4.0, 1.0)
+        let fireopacity = Math.min(state.fire[i]/3.0, 1.0)
         let firesize = Math.min(state.fire[i]/5.0, 1.0)
         let firecontrast = state.fire[i]/8.0
         $('#p' + i + ' > .character > .fire > .fireani').css({
