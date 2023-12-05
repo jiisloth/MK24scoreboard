@@ -22,6 +22,9 @@ socket.addEventListener('message', function (event) {
     if (msg.type === "get_state"){
         socket.send(JSON.stringify({'type': 'init_state', 'state': states[currentstate]}));
     }
+    if (msg.type === "get_all_states"){
+        socket.send(JSON.stringify({'type': 'all_states', 'state': states}));
+    }
 });
 
 let settings_to_send
@@ -81,6 +84,7 @@ $(document).ready(function () {
     draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
 
     $(document).keydown(function (e) {
+        let do_draw = false
         if (e.keyCode === 8){
             e.preventDefault()
         }
@@ -112,20 +116,24 @@ $(document).ready(function () {
             }
             if (state){
                 send_data({"type": "state", "state": state})
+                do_draw = true
             }
         } else if (e.keyCode === 37) { // LEFT
             if (currentstate > 0){
                 currentstate -= 1;
+                do_draw = true
                             }
         }
         else if (e.keyCode === 39) { // RIGHT
             if (currentstate < states.length-1){
                 currentstate += 1;
+                do_draw = true
                             }
         }
         else if (e.keyCode === 9) { // TAB
             e.preventDefault()
             $('#scoreboard').toggleClass("hidehelp")
+            do_draw = true
 
         }
         else if (mcodes.indexOf(e.keyCode) < mapstates[currentmapstate].length && mcodes.indexOf(e.keyCode) >= 0){
@@ -138,18 +146,23 @@ $(document).ready(function () {
             send_data({"type": "mapstate", "mapstate": new_mapstate})
             currentmapstate = mapstates.length -1;
             localStorage.maps = JSON.stringify(mapstates);
+            do_draw = true
         } else if (e.keyCode === 109 || e.keyCode === 189) { // num.minus
             if (currentmapstate > 0){
                 currentmapstate -= 1;
+                do_draw = true
             }
         }
         else if (e.keyCode === 107 || e.keyCode === 187) { // num.plus
             if (currentmapstate < mapstates.length-1){
                 currentmapstate += 1;
+                do_draw = true
             }
         }
         hold_button[e.keyCode] = true;
-        draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate], maps);
+        if (do_draw){
+            draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate], maps);
+        }
     });
     $(document).keyup(function (e) {
         hold_button[e.keyCode] = false;
@@ -481,5 +494,6 @@ function next_round(p, oldstate, s, action) {
             state.dnf[p] = true;
         }
     }
+
     return state
 }
