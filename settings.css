@@ -45,7 +45,7 @@ body, html{
     justify-content: center;
 }
 .menu_row{
-    margin: 10px auto;
+    margin: 8px auto;
     min-width: 60%;
     max-width: 100%;
     display: flex;

@@ -5,6 +5,7 @@ const socket = new WebSocket('wss://mk24.jsloth.fi:443');
 
 let secret
 let layout = "normal"
+let aspectratio = "threefour"
 let header = false
 let show_controllers = true
 let sort = false
@@ -53,6 +54,7 @@ socket.addEventListener('message', function (event) {
         states.push(msg.state)
         if (currentstate === states.length-2) {
             currentstate += 1
+            check_action()
         }
         draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate], maps);
     }
@@ -83,8 +85,66 @@ $(window).on('resize', function(){
     var win = $(this); //this = window
     win_width = win.width
     win_height = win.height
-    console.log("aaa")
 });
+
+let soundplayer = new Audio();
+function playAudio(audio, modifier=0.5){
+    soundplayer.src = audio;
+    soundplayer.playbackRate = 0.8 + modifier*0.4;
+    soundplayer.preservesPitch = false;
+    soundplayer.play();
+}
+function check_action(){
+    if (states.length < 2){
+        return
+    }
+    let was = states[states.length-2]
+    let now = states[states.length-1]
+    let diff = check_difference(was.wins, now.wins)
+    if (diff.length === 1){
+        if (was.wins[diff[0]] < now.wins[diff[0]]){
+            playAudio("sound/mkwin.wav", diff[0]/(was.wins.length-1))
+            console.log("win")
+            return;
+        }
+    }
+    diff = check_difference(was.dnf, now.dnf)
+    if (diff.length === 1){
+        if (now.dnf[diff[0]]){
+            playAudio("sound/mkdnf.wav", diff[0]/(was.wins.length-1))
+            console.log("dnf")
+            return;
+        }
+    }
+    diff = check_difference(was.spes, now.spes)
+    if (diff.length === 1){
+        if (was.spes[diff[0]].length < now.spes[diff[0]].length){
+            playAudio("sound/mkpenalty.wav", diff[0]/(was.wins.length-1))
+            console.log("penalty")
+            return;
+        }
+    }
+    for (let i = 0; i < now.line.length; i ++){
+        if (now.line[i] === now.line.length-1){
+            playAudio("sound/mkskip.wav", i/(was.wins.length-1))
+            console.log("skip")
+            return;
+        }
+    }
+
+}
+
+function check_difference(a, b){
+    let diff = []
+    if (a !== b){
+        for (let i = 0; i < a.length; i ++){
+            if (a[i] !== b[i]){
+                diff.push(i)
+            }
+        }
+    }
+    return diff
+}
 
 function start() {
     win_width = $(window).width()
@@ -147,6 +207,8 @@ function start() {
 function set_layout(){
     $('#textheader').hide()
     $('.gamearea').hide()
+    $('#scoreboard').addClass(aspectratio)
+    let bottom = 48
     if (layout === "stream"){
         $('#scoreboard').addClass("streamlayout")
         $('body').css('background', 'transparent');
@@ -157,21 +219,30 @@ function set_layout(){
         //$('.round:nth-child(odd)').css('background', 'transparent');
         //$('.goal').css('background', 'transparent');
         $('#players').css('padding-top', "0")
-        let gamewidth = (win_height-48)/3 * 4
-        $('.gamearea').css('height', (win_height-48)+"px")
-        $('.gamearea').css('width', (gamewidth)+"px")
         $('#players').css('background', '#483ece url("images/misc/background4.png")');
 
+        $('#rounds').css('padding-left', 0)
+        $('#rounds').css('position', "absolute")
+        $('#rounds').css('bottom', "0px")
+        $('#rounds').css('background', '#3831b1');
+        let gamewidth = (win_height-bottom)/3 * 4
+        if (aspectratio == "threefour"){
+            $('.labeltxt').css('display', "inline-block")
+            $('#rounds').css('height', "48px")
+        } else {
+            bottom = 180
+            gamewidth = (win_height-bottom)/9 * 16
+            $('.labeltxt').css('display', "none")
+            $('.info_char').css('margin-top', "-17px")
+
+        }
+        $('#rounds').css('height', bottom+"px")
+        $('.gamearea').css('width', (gamewidth)+"px")
+        $('.gamearea').css('height', (win_height-bottom)+"px")
         $('#players').css('width', win_width - gamewidth + "px");
         $('#cam').css('width', win_width - gamewidth + "px");
         $('#textheader').css('width', win_width - gamewidth + "px");
-        $('#players').css('height', (win_height-48) +"px");
-        $('#rounds').css('padding-left', 0)
-        $('#rounds').css('position', "absolute")
-        $('#rounds').css('height', "48px")
-        $('#rounds').css('bottom', "0px")
-        $('#rounds').css('background', '#3831b1');
-        $('.labeltxt').css('display', "inline-block")
+        $('#players').css('height', (win_height-bottom) +"px");
         $('.round').css('padding-top', "4px")
         $('.character').css('bottom', "25px")
         $('.special').css('bottom', "-54px")
@@ -180,17 +251,17 @@ function set_layout(){
 
     }
     if (header === "empty-big") {
-        $('#players').css('height', (win_height-48-240) +"px");
+        $('#players').css('height', (win_height-bottom-240) +"px");
         $('#players').css('top', "240px");
 
     }
     if (header === "empty-small") {
-        $('#players').css('height', (win_height-48-64) +"px");
+        $('#players').css('height', (win_height-bottom-64) +"px");
         $('#players').css('top', "64px");
 
     }
     if (header === "cam") {
-        $('#players').css('height', (win_height-48-240) +"px");
+        $('#players').css('height', (win_height-bottom-240) +"px");
         $('#players').css('top', "240px");
         $('#cam').show()
     }
@@ -198,7 +269,7 @@ function set_layout(){
         $('.controller_holder').hide()
     }
     if (header === "text") {
-        $('#players').css('height', (win_height-48-64) +"px");
+        $('#players').css('height', (win_height-bottom-64) +"px");
         $('#players').css('top', "64px");
         $('#textheader').show()
     }
@@ -288,6 +359,8 @@ function read_attributes() {
                     secret = pair[1]
                 } else if (pair[0] === "layout") {
                     layout = pair[1]
+                } else if (pair[0] === "ratio") {
+                    aspectratio = pair[1]
                 } else if (pair[0] === "sort") {
                     sort = pair[1]
                 } else if (pair[0] === "header") {
@@ -418,9 +491,25 @@ function draw_state(state, controllers, mapstate, maplist) {
     $('.player').removeClass('dnf');
     $('.special').remove();
     for (let i = 0; i < state.wins.length; i ++){
-        let left = ((leftoffset-87) + (state.wins[i]+1) * width) + "px";
-        $('#p' + i +' > .character').css({"-webkit-transform":"translate("+left+",0px)"});
-        if (layout === "stream") {
+        let left = ((leftoffset-87) + (state.wins[i]+1) * width);
+        let bottom = 0;
+        if (aspectratio === "sixteennine"){
+            bottom = 146/state.playsline.length * i
+            let pos_in_wins = 0
+            let p_in_wins = 0
+            for (let j = 0; j < state.wins.length; j ++){
+                if (state.wins[j] === state.wins[i]){
+                    p_in_wins += 1
+                    if (order.indexOf(i) < order.indexOf(j)) {
+                        pos_in_wins += 1
+                    }
+                }
+            }
+            left += 15 - pos_in_wins * (30/p_in_wins)
+
+        }
+        $('#p' + i +' > .character').css({"-webkit-transform":"translate("+left+"px,"+bottom+"px)"});
+        if (layout === "stream" && aspectratio === "threefour"){
             $('#p' + i + ' > .character').css("z-index", 50 - order.indexOf(i));
         }
         $('#p' + i + ' > div > div > .stats > .wins').html(state.wins[i]);
@@ -469,8 +558,7 @@ function draw_state(state, controllers, mapstate, maplist) {
             if (i !== jonne && state.playsline[i] >= state.playsline[jonne]){
                 jonne_active = 0
             }
-            console.log(settings.players[i][0])
-            console.log(state.line[i]+1)
+
             $('#playername' + (state.line[i]+1) +' > .name').html(settings.players[i][0]);
         } else {
             $('#p' + i +' > .line').html((state.line[i] - controllers + 1) + ".");
@@ -495,7 +583,11 @@ function draw_state(state, controllers, mapstate, maplist) {
                     '<img src="images/icons/special.png" class="special special2" ' +
                 'style="left:' + (leftoffset + spes[s] * width + width/2 -30)  + 'px">')
             if (layout === "stream") {
-                $('.special').css('bottom', "-20px")
+                if (aspectratio === "sixteennine") {
+                    $('#p' + i + ' .special').css('bottom', -bottom - 30 + "px")
+                } else {
+                    $('#p' + i + ' .special').css('bottom',  -20 + "px")
+                }
                 $('#p' + i +' > div > div > div > .special_holder').append('<div class="name_special">' + spes[s] + '</div>');
 
             }

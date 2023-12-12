@@ -386,6 +386,7 @@ function start_spectator_mode(){
         if (!$('#spec_bg').is(':checked')){
             args += "&bg=false";
         }
+        args += "&ratio=" + $('input[name="spec_ratio"]:checked').val();
         if ($('input[name="spec_header"]:checked').val() !== "no"){
             args += "&header="+ $('input[name="spec_header"]:checked').val()
         }

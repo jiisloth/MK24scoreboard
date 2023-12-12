@@ -27,6 +27,15 @@ socket.addEventListener('message', function (event) {
     }
 });
 
+let soundplayer = new Audio();
+
+function playAudio(audio, modifier=0.5){
+    soundplayer.src = audio;
+    soundplayer.playbackRate = 0.8 + modifier*0.4;
+    soundplayer.preservesPitch = false;
+    soundplayer.play();
+}
+
 let settings_to_send
 
 function send_data(data) {
@@ -95,24 +104,31 @@ $(document).ready(function () {
             if (currentstate !== states.length-1) {
                 states = states.slice(0, currentstate + 1)
             }
+            let soundmod = (pcodes.indexOf(e.keyCode)/(settings.players.length-1))
             if (hold_button[46]) {
                 state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'dnf')
+                playAudio("sound/mkdnf.wav", soundmod)
                 states.push(state);
                 currentstate = states.length-1;
                 localStorage.states = JSON.stringify(states);
             } else if (states[currentstate].line[pcodes.indexOf(e.keyCode)] < settings.controllers){
                 if (hold_button[8]){ // backspace
                     state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'skip')
+                    playAudio("sound/mkskip.wav", soundmod)
                     states.push(state);
                 } else if (hold_button[16]){ // shift
                     state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'spes')
+                    playAudio("sound/mkpenalty.wav", soundmod)
                     states.push(state);
                 } else {
                     state = next_round(pcodes.indexOf(e.keyCode), states[currentstate], settings, 'win')
+                    playAudio("sound/mkwin.wav", soundmod)
                     states.push(state);
                 }
                 currentstate = states.length-1;
                 localStorage.states = JSON.stringify(states);
+            } else {
+                playAudio("sound/mkno.wav", soundmod*0.6+0.2)
             }
             if (state){
                 send_data({"type": "state", "state": state})
@@ -120,19 +136,30 @@ $(document).ready(function () {
             }
         } else if (e.keyCode === 37) { // LEFT
             if (currentstate > 0){
+                playAudio("sound/mkbutton.wav", 0.1)
                 currentstate -= 1;
                 do_draw = true
                             }
+            else {
+                playAudio("sound/mkno.wav", 0.4+ Math.random()*0.2)
+
+            }
         }
         else if (e.keyCode === 39) { // RIGHT
             if (currentstate < states.length-1){
+                playAudio("sound/mkbutton.wav", 0.9)
                 currentstate += 1;
                 do_draw = true
                             }
+            else {
+                playAudio("sound/mkno.wav", 0.4+ Math.random()*0.2)
+
+            }
         }
         else if (e.keyCode === 9) { // TAB
             e.preventDefault()
             $('#scoreboard').toggleClass("hidehelp")
+            playAudio("sound/mkbutton.wav", 0.5)
             do_draw = true
 
         }
@@ -140,6 +167,7 @@ $(document).ready(function () {
             if (currentmapstate !== mapstates.length-1){
                     mapstates = mapstates.slice(0, currentmapstate+1)
             }
+            playAudio("sound/mkmap.wav", mcodes.indexOf(e.keyCode)/(mapstates[currentmapstate].length-1) )
             let new_mapstate = mapstates[currentmapstate].slice();
             new_mapstate[mcodes.indexOf(e.keyCode)] += 1;
             mapstates.push(new_mapstate);
@@ -149,14 +177,24 @@ $(document).ready(function () {
             do_draw = true
         } else if (e.keyCode === 109 || e.keyCode === 189) { // num.minus
             if (currentmapstate > 0){
+                playAudio("sound/mkbutton.wav", 0.1)
                 currentmapstate -= 1;
                 do_draw = true
+            }
+            else {
+                playAudio("sound/mkno.wav", 0.4+ Math.random()*0.2)
+
             }
         }
         else if (e.keyCode === 107 || e.keyCode === 187) { // num.plus
             if (currentmapstate < mapstates.length-1){
+                playAudio("sound/mkbutton.wav", 0.9)
                 currentmapstate += 1;
                 do_draw = true
+            }
+            else {
+                playAudio("sound/mkno.wav", 0.4+ Math.random()*0.2)
+
             }
         }
         hold_button[e.keyCode] = true;
@@ -171,6 +209,7 @@ $(document).ready(function () {
         for (let c = 0; c < maps.length; c++){
             m = maps[c].indexOf(this.id);
             if (m >= 0){
+                playAudio("sound/mkmap.wav", m/(mapstates[currentmapstate].length-1) )
                 let new_mapstate = mapstates[currentmapstate].slice();
                 new_mapstate[c * 4 + m] += 1;
                 mapstates.push(new_mapstate);
@@ -183,6 +222,7 @@ $(document).ready(function () {
         draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
     });
     $('#gamecode').click(function () {
+        playAudio("sound/mkbutton.wav", Math.random() )
         navigator.clipboard.writeText(gamecode);
     });
 });
