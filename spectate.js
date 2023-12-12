@@ -105,6 +105,32 @@ function check_action(){
         if (was.wins[diff[0]] < now.wins[diff[0]]){
             playAudio("sound/mkwin.wav", diff[0]/(was.wins.length-1))
             console.log("win")
+            if (layout === "stream"){
+                $('#winner').show()
+                let true_win = false
+                if (now.wins[diff[0]] === settings.rounds +1){
+                    true_win = true
+                    for (let i = 0; i < now.wins.length; i ++){
+                        if (i !== diff[0] && now.wins[i] > settings.rounds){
+                            true_win = false
+                        }
+                    }
+                }
+
+                if (true_win){
+                    $('#winner').html(settings.players[diff[0]][0] + " voitti pelin!!!");
+                    setTimeout(function (){
+                        $('#winner').fadeOut()
+                    }, 60000)
+
+                } else {
+                    $('#winner').html(settings.players[diff[0]][0] + " voitti kierroksen!");
+                    setTimeout(function (){
+                        $('#winner').fadeOut()
+                    }, 15000)
+
+                }
+            }
             return;
         }
     }
@@ -205,6 +231,7 @@ function start() {
 
 
 function set_layout(){
+    $('#winner').hide()
     $('#textheader').hide()
     $('.gamearea').hide()
     $('#scoreboard').addClass(aspectratio)
