@@ -1,4 +1,4 @@
-const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire', 'luffy'];
+const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire', 'luffy', 'vanska'];
 
 const socket = new WebSocket('wss://mk24.jsloth.fi:443');
 let is_online = false

@@ -13,7 +13,7 @@ $(document).ready(function () {
     const playericons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad',
         'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette',
         'bowsette2'];
-    const specialicons = ['misato2', 'misato', 'zerotwo', 'zerotwotwo', 'megaman', 'barret', 'kratos', 'hiire', 'Nyan', 'geralt', 'luffy'];
+    const specialicons = ['misato2', 'misato', 'zerotwo', 'zerotwotwo', 'megaman', 'barret', 'kratos', 'hiire', 'Nyan', 'geralt', 'luffy', 'vanska'];
 
     player_menu = create_icon_buttons(playericons,specialicons, player_menu);
 
@@ -291,6 +291,8 @@ $(document).ready(function () {
             $('#icon_Nyan').removeClass('mystery')
         } else if (name.toLowerCase() === 'veliboi') {
             $('#icon_geralt').removeClass('mystery')
+        } else if (name.toLowerCase() === 'kalevi' || name.toLowerCase() === 'kal3vi') {
+            $('#icon_vanska').removeClass('mystery')
         }
     }
     function start_scoreboard(load) {
