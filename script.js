@@ -3,10 +3,18 @@ const golden = ['megaman', 'kratos', 'barret', 'geralt', 'hiire', 'luffy', 'vans
 const socket = new WebSocket('wss://mk24.jsloth.fi:443');
 let is_online = false
 let gamecode = ""
+
+const rpnames = ['Jarkko666', 'AnimeFan', 'PressF', 'Racingst', 'Anon', 'Ville98', 'ThePekka', 'Mikko___', 'R0nald0', '_-Edgyboi-_', 'SuperRacer', 'X', 'Fruktoosi', 'Mufasa_Died', 'Olli', 'Ahven', 'Doge', 'Ritva', 'bbyparkpls', 'how2drive', 'Jesus']
+const ricons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad', 'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette', 'bowsette2'];
 // Connection opened
 socket.addEventListener('open', function (event) {
     is_online = true
-    socket.send(JSON.stringify({'type': 'host'}));
+    if (gamecode === ""){
+        socket.send(JSON.stringify({'type': 'host'}));
+    } else {
+        console.log(gamecode)
+        socket.send(JSON.stringify({'type': 'join', 'secret': gamecode}));
+    }
 });
 
 // Listen for messages
@@ -14,7 +22,12 @@ socket.addEventListener('message', function (event) {
     let msg = JSON.parse(event.data)
     if (msg.type === "init_lobby"){
         console.log("JOINCODE: " + msg.secret)
+        localStorage.gamecode = JSON.stringify(msg.secret);
         gamecode = msg.secret
+    }
+    if (msg.type === "joined"){
+        console.log("Joined lobby as host")
+        socket.send(JSON.stringify({'type': 'reset_state', 'state': states[currentstate]}));
     }
     if (msg.type === "get_settings"){
         socket.send(JSON.stringify({'type': 'settings', 'settings': settings_to_send}));
@@ -24,6 +37,9 @@ socket.addEventListener('message', function (event) {
     }
     if (msg.type === "get_all_states"){
         socket.send(JSON.stringify({'type': 'all_states', 'state': states}));
+    }
+    if (msg.type === "error"){
+        console.log("ERROR: " + msg.message)
     }
 });
 
@@ -49,12 +65,13 @@ let state;
 let mapstates;
 let currentstate;
 let currentmapstate;
+let settings;
 
 const playernumbers = "1234567890QWERTYUIOP"
 const linecolors = ["#ececf1", "#cfd6e0", "#aec1e1", "#95b1e1", "#7ba1e0", "#6291e0", "#4881df", "#3474df",]
 
 $(document).ready(function () {
-    let settings = read_attributes();
+    settings = read_attributes();
     let hold_button = {};
     if (settings.mode === 'init'){
         state = init_state(settings.players, settings.controllers);
@@ -62,15 +79,27 @@ $(document).ready(function () {
         mapstates = [init_mapstate()];
         settings.mode = 'cookie';
         localStorage.states = JSON.stringify(states);
+        localStorage.gamecode = JSON.stringify("");
         localStorage.settings = JSON.stringify(settings);
         localStorage.maps = JSON.stringify(mapstates);
-        window.location.href =  "scoreboard.html";
+        window.history.pushState({}, document.title, window.location.pathname );
+        currentstate = 0;
+        currentmapstate = 0;
+    } else if (settings.mode === 'reset'){
+        settings = JSON.parse(localStorage.settings);
+        gamecode = JSON.parse(localStorage.gamecode);
+        state = init_state(settings.players, settings.controllers);
+        states = [add_state(state)];
+        mapstates = [init_mapstate()];
+        settings.mode = 'cookie';
+        window.history.pushState({}, document.title, window.location.pathname );
         currentstate = 0;
         currentmapstate = 0;
     } else if (settings.mode === 'cookie'){
         states = JSON.parse(localStorage.states);
         settings = JSON.parse(localStorage.settings);
         mapstates = JSON.parse(localStorage.maps);
+        gamecode = JSON.parse(localStorage.gamecode);
 
         currentstate = states.length-1;
         currentmapstate = mapstates.length-1;
@@ -310,6 +339,8 @@ function generate_players(players, playerkeys) {
 
 function read_attributes() {
     let attr = decodeURI(window.location.search.substring(1));
+    console.log("WAT")
+    console.log(attr)
     if (attr){
         attr = attr.split('&');
         const load = attr[0].split('=')[1];
@@ -322,10 +353,43 @@ function read_attributes() {
             const controllers = parseInt(attr[2].split('=')[1]);
             const rounds = parseInt(attr[3].split('=')[1]);
             return {mode: load, players: players, controllers: controllers, rounds: rounds};
+        } else if (load === 'test'){
+            console.log("test?")
+            let pc = 10
+            let rc = 24
+            let ctrl = 4
+            for (let a = 1; a < attr.length; a++) {
+                if (attr[a].split('=')[0] === "players"){
+                    pc = attr[a].split('=')[1]
+                }
+                if (attr[a].split('=')[0] === "rounds"){
+                    rc = attr[a].split('=')[1]
+                }
+                if (attr[a].split('=')[0] === "controllers"){
+                    ctrl = attr[a].split('=')[1]
+                }
+            }
+            let rspnames = rpnames
+                .map(value => ({ value, sort: Math.random() }))
+                .sort((a, b) => a.sort - b.sort)
+                .map(({ value }) => value)
+            let rsicons = ricons
+                .map(value => ({ value, sort: Math.random() }))
+                .sort((a, b) => a.sort - b.sort)
+                .map(({ value }) => value)
+
+            let players = [];
+            for (let p = 0; p < pc; p++) {
+                players.push([rspnames[p], rsicons[p]]);
+            }
+            return {mode: "init", players: players, controllers: ctrl, rounds: rc};
+
         } else {
             return {mode: load};
         }
     } else {
+
+        console.log("NO ATTR?")
         return {mode: 'cookie'};
     }
 

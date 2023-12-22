@@ -32,11 +32,9 @@ socket.addEventListener('message', function (event) {
     }
     if (msg.type === "settings"){
         console.log("got settings")
-        if (settings === false) {
-            settings = msg.settings
-            start()
-            socket.send(JSON.stringify({'type': 'get_state'}));
-        }
+        settings = msg.settings
+        start()
+        socket.send(JSON.stringify({'type': 'get_state'}));
     }
     if (msg.type === "init_state"){
         console.log("got init")
@@ -48,6 +46,14 @@ socket.addEventListener('message', function (event) {
             }
             draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate], maps);
         }
+    }
+    if (msg.type === "reset_state"){
+        console.log("got reset")
+        states.push(msg.state)
+        if (currentstate === states.length-2) {
+            currentstate += 1
+        }
+        draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate], maps);
     }
     if (msg.type === "state"){
         console.log("got state")
@@ -65,6 +71,9 @@ socket.addEventListener('message', function (event) {
             currentmapstate += 1
         }
         draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate], maps);
+    }
+    if (msg.type === "error"){
+        console.log("ERROR: " + msg.message)
     }
 });
 
