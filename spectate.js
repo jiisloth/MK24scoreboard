@@ -14,7 +14,6 @@ read_attributes()
 
 let win_width = 0
 let win_height = 0
-
 let inited = false
 
 console.log(secret)
@@ -23,6 +22,12 @@ socket.addEventListener('open', function (event) {
     socket.send(JSON.stringify({'type': 'join', "secret": secret}));
 });
 
+let weapons = {
+    0: {"name": "LÄHETÄ TUKEA", "show_target_list": true, "duration": 0},
+    1: {"name": "KASA PASKAA", "show_target_list": true, "duration": 5 * 60},
+    2: {"name": "KORTTI POIS", "show_target_list": true, "duration": 0},
+    3: {"name": "OTETAANPA UUSIKSI", "show_target_list": false, "duration": 0}
+}
 // Listen for messages
 socket.addEventListener('message', function (event) {
     let msg = JSON.parse(event.data)
@@ -35,6 +40,7 @@ socket.addEventListener('message', function (event) {
         settings = msg.settings
         start()
         socket.send(JSON.stringify({'type': 'get_state'}));
+        socket.send(JSON.stringify({'type': 'get_weapon_usage'}));
     }
     if (msg.type === "init_state"){
         console.log("got init")
@@ -54,6 +60,26 @@ socket.addEventListener('message', function (event) {
             currentstate += 1
         }
         draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate], maps);
+    }
+    if (msg.type === "weapon_use"){
+        let wpu_use = msg.weapon_use
+        weapon_usage.push(wpu_use)
+        $('#weapon_used_blink').show()
+        let text = ""
+        if (wpu_use["target"] === null){
+            text = settings.players[wpu_use["shooter"]][0] + " käytti " + weapons[wpu_use["weapon"]]["name"] + "!"
+        } else {
+            text = settings.players[wpu_use["shooter"]][0] + " käytti " + weapons[wpu_use["weapon"]]["name"] + " kohteeseen " + settings.players[wpu_use["target"]][0] + "!"
+        }
+        $('#weapon_used_blink').html(text);
+        setTimeout(function (){
+            $('#weapon_used_blink').fadeOut()
+        }, 15000)
+        draw_weapons();
+    }
+    if (msg.type === "weapon_usage"){
+        weapon_usage = msg.weapon_usage
+        draw_weapons();
     }
     if (msg.type === "state"){
         console.log("got state")
@@ -82,6 +108,7 @@ let mapstates;
 let currentstate;
 let currentmapstate;
 let settings = false
+let weapon_usage = [];
 
 const maps = [
     ['LuigiCircuit', 'PeachBeach', 'BabyPark', 'DryDryDesert'],
@@ -202,6 +229,13 @@ function start() {
     draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
 
     set_layout()
+
+    if (settings.use_weapons){
+        $(".weapons").show()
+    } else {
+        $(".weapons").hide()
+    }
+
     $(document).keydown(function (e) {
         if (e.keyCode === 8){
             e.preventDefault()
@@ -241,6 +275,7 @@ function start() {
 
 function set_layout(){
     $('#winner').hide()
+    $('#weapon_used_blink').hide()
     $('#textheader').hide()
     $('.gamearea').hide()
     $('#scoreboard').addClass(aspectratio)
@@ -369,6 +404,12 @@ function generate_players(players) {
             '<div class="playslinehover">' +
             '<div class="playslineico"><img class="lineimg" src="images/icons/playsline.png"><div class="labeltxt">Sohvalla: </div><div class="playsline"></div><div class="extraplaysline">PB:<div class="playspb"></div></div></div>' +
             '<div class="playslinepbico"><img class="linepbimg" src="images/icons/playsline.png"><div class="labeltxt">Sohva PB: </div><div class="playspb"></div></div>' +
+            '</div>' +
+            '<div class="weapons">' +
+            '<div class="weapon" id="p_' + p +'_weapon_0"><img src="images/misc/weapon_friends.png"></div>' +
+            '<div class="weapon" id="p_' + p +'_weapon_1"><img src="images/misc/weapon_poop.png"></div>' +
+            '<div class="weapon" id="p_' + p +'_weapon_2"><img src="images/misc/weapon_ban.png"></div>' +
+            '<div class="weapon" id="p_' + p +'_weapon_3"><img src="images/misc/weapon_dice.png"></div>' +
             '</div>' +
             '</div>' +
             '</div>' +
@@ -506,6 +547,13 @@ function get_played(){
         total += last_state.wins[i]
     }
     return total
+}
+function draw_weapons(){
+    for (let i = 0; i < weapon_usage.length; i ++){
+        let use = weapon_usage[i]
+        $('#p_' + use["shooter"] + '_weapon_' + use["weapon"]).addClass("used_weapon")
+
+    }
 }
 
 function draw_state(state, controllers, mapstate, maplist) {

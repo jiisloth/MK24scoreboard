@@ -280,7 +280,58 @@ body, html{
     margin-right: -10px;
     margin-left: -30px;
 }
+.weapons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.weapon{
+    flex-grow: 1;
+    align-content: center;
+    text-align: center;
+    cursor: pointer;
+}
+.used_weapon{
+    filter: saturate(0);
+    opacity: 0.5;
+}
+#weapon_menu{
+    font-size: 28px;
+    color: white;
+    display: none;
+    position: absolute;
+    left: 160px;
+    top: 160px;
+    width: 600px;
+    margin: auto;
+    background-color: #3831b1;
+    z-index: 100;
+    padding: 20px;
+}
+.weapon_target{
+    border: rgba(255, 255, 255, 0) 2px solid;
+    padding-left: 10px;
+}
+.targeted_player{
+    border: white 2px solid;
+}
 
+.column{
+    display: flex;
+    flex-direction: column;
+}
+.disabled_btn{
+    color: #525151;
+}
+.weapon_menu_row{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.weapon_menu_row > div{
+    display: inline-block;
+    padding: 10px;
+}
 .character{
     z-index: 10;
     margin-top: -10px;
@@ -539,9 +590,28 @@ body, html{
     margin-top: -20px;
 }
 
-#winner{
+#weapon_used_blink{
     position: absolute;
     top: 48%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 48px;
+    background: #fdfdfe;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: rainbow_animation 6s ease-in-out infinite;
+    background-size: 400% 100%;
+    filter: drop-shadow(4px 0px 0 rgb(0, 0, 0))
+            drop-shadow(0px -4px 0 rgb(0, 0, 0))
+            drop-shadow(-4px 0px 0 rgb(0, 0, 0))
+            drop-shadow(0px 4px 0 rgb(0, 0, 0));
+}
+
+#winner{
+    position: absolute;
+    top: 47%;
     left: 0;
     right: 0;
     text-align: center;

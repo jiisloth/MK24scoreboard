@@ -4,6 +4,19 @@ const socket = new WebSocket('wss://mk24.jsloth.fi:443');
 let is_online = false
 let gamecode = ""
 
+let weapons = {
+    0: {"name": "Send friends", "show_target_list": true, "duration": 0},
+    1: {"name": "Shit on", "show_target_list": true, "duration": 5 * 60},
+    2: {"name": "Ban driver", "show_target_list": true, "duration": 0},
+    3: {"name": "Re-Roll shaders", "show_target_list": false, "duration": 0}
+}
+let weapon_in_use = {
+    "shooter": null,
+    "target": null,
+    "weapon": null
+}
+let weapon_usage = []
+
 const rpnames = ['Jarkko666', 'AnimeFan', 'PressF', 'Racingst', 'Anon', 'Ville98', 'ThePekka', 'Mikko___', 'R0nald0', '_-Edgyboi-_', 'SuperRacer', 'X', 'Fruktoosi', 'Mufasa_Died', 'Olli', 'Ahven', 'Doge', 'Ritva', 'bbyparkpls', 'how2drive', 'Jesus']
 const ricons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad', 'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette', 'bowsette2'];
 // Connection opened
@@ -34,6 +47,9 @@ socket.addEventListener('message', function (event) {
     }
     if (msg.type === "get_state"){
         socket.send(JSON.stringify({'type': 'init_state', 'state': states[currentstate]}));
+    }
+    if (msg.type === "get_weapon_usage"){
+        socket.send(JSON.stringify({'type': 'weapon_usage', 'weapon_usage': weapon_usage}));
     }
     if (msg.type === "get_all_states"){
         socket.send(JSON.stringify({'type': 'all_states', 'state': states}));
@@ -82,6 +98,7 @@ $(document).ready(function () {
         localStorage.gamecode = JSON.stringify("");
         localStorage.settings = JSON.stringify(settings);
         localStorage.maps = JSON.stringify(mapstates);
+        localStorage.weapon_usage = JSON.stringify(weapon_usage);
         window.history.pushState({}, document.title, window.location.pathname );
         currentstate = 0;
         currentmapstate = 0;
@@ -96,6 +113,7 @@ $(document).ready(function () {
         currentstate = 0;
         currentmapstate = 0;
     } else if (settings.mode === 'cookie'){
+        weapon_usage = JSON.parse(localStorage.weapon_usage);
         states = JSON.parse(localStorage.states);
         settings = JSON.parse(localStorage.settings);
         mapstates = JSON.parse(localStorage.maps);
@@ -121,6 +139,13 @@ $(document).ready(function () {
     generate_players(settings.players, playerkeys);
     draw_state(states[currentstate], settings.controllers, mapstates[currentmapstate],  maps);
 
+    if (settings.use_weapons){
+        $(".weapons").show()
+    } else {
+        $(".weapons").hide()
+    }
+
+    draw_weapons()
     $(document).keydown(function (e) {
         let do_draw = false
         if (e.keyCode === 8){
@@ -254,10 +279,76 @@ $(document).ready(function () {
         playAudio("sound/mkbutton.wav", Math.random() )
         navigator.clipboard.writeText(gamecode);
     });
+    $('.weapon').click(function () {
+        let wid = this.id;
+        let wplayer = parseInt(wid.split("_")[1]);
+        let wweapon = parseInt(wid.split("_")[3]);
+        open_weapon_menu(wplayer, wweapon)
+    });
+    $('.weapon_target').click(function () {
+        let wid = this.id;
+        let target = parseInt(wid.split("_")[2]);
+        weapon_in_use["target"] = parseInt(target);
+        $(".targeted_player").removeClass("targeted_player")
+        $("#weapon_use").removeClass("disabled_btn")
+        $(this).addClass("targeted_player")
+    });
+    $('#weapon_back').click(function () {
+        $("#weapon_menu").hide()
+        weapon_in_use["target"] = null;
+        weapon_in_use["shooter"] = null;
+        weapon_in_use["weapon"] = null;
+    });
+    $('#weapon_use').click(function () {
+        use_weapon()
+    });
 });
 
+function use_weapon(){
+    let weapon = weapons[weapon_in_use["weapon"]]
+    if ((weapon["show_target_list"] && weapon_in_use["target"] !== null) || (weapon["show_target_list"] === false)){
+        $("#weapon_menu").hide()
+        let use = {"target": weapon_in_use["target"], "shooter": weapon_in_use["shooter"], "weapon": weapon_in_use["weapon"], "timestamp":Date.now(), "end_time": 0}
+        if (weapon["duration"] !== 0){
+            use["end_time"] = Date.now() + weapon["duration"]*1000
+        }
+        weapon_usage.push(use)
+        localStorage.weapon_usage = JSON.stringify(weapon_usage);
+        send_data({"type": "weapon_use", "weapon_use": use})
+        weapon_in_use["target"] = null;
+        weapon_in_use["shooter"] = null;
+        weapon_in_use["weapon"] = null;
+        draw_weapons()
 
+    }
+}
 
+function draw_weapons(){
+    for (let i = 0; i < weapon_usage.length; i ++){
+        let use = weapon_usage[i]
+        $('#p_' + use["shooter"] + '_weapon_' + use["weapon"]).addClass("used_weapon")
+
+    }
+}
+
+// weapons: SEND_FRIENDS, SHIT ON, BAN PLAYER, RE-ROLL
+function open_weapon_menu(shooter, weapon_id){
+    let weapon = weapons[weapon_id]
+    $("#weapon_menu").show()
+    $("#weapon_name").html(weapon["name"])
+    $("#weapon_user_name").html(settings.players[shooter][0])
+    $(".targeted_player").removeClass(".targeted_player")
+    weapon_in_use["target"] = null;
+    weapon_in_use["shooter"] = shooter;
+    weapon_in_use["weapon"] = weapon_id;
+    if (weapon["show_target_list"] === true){
+        $("#weapon_target_list").show()
+        $("#weapon_use").addClass("disabled_btn")
+    } else {
+        $("#weapon_target_list").hide()
+        $("#weapon_use").removeClass("disabled_btn")
+    }
+}
 
 
 function generate_maps(maps, mapkeys) {
@@ -308,6 +399,12 @@ function generate_players(players, playerkeys) {
             '<div class="playslineico"><img class="lineimg" src="images/icons/playsline.png"><div class="playsline"></div></div>' +
             '<div class="playslinepbico"><img class="linepbimg" src="images/icons/playsline.png"><div class="playspb"></div></div>' +
             '</div>' +
+            '<div class="weapons">' +
+            '<div class="weapon" id="p_' + p +'_weapon_0"><img src="images/misc/weapon_friends.png"></div>' +
+            '<div class="weapon" id="p_' + p +'_weapon_1"><img src="images/misc/weapon_poop.png"></div>' +
+            '<div class="weapon" id="p_' + p +'_weapon_2"><img src="images/misc/weapon_ban.png"></div>' +
+            '<div class="weapon" id="p_' + p +'_weapon_3"><img src="images/misc/weapon_dice.png"></div>' +
+            '</div>' +
             '</div>' +
             '</div>' +
             '</div>' +
@@ -334,13 +431,12 @@ function generate_players(players, playerkeys) {
         $('#p' + p + ' > .playerkeyhelp').css({
             "-webkit-transform": "translate(" + helptextpos + ",0px)",
         })
+        $("#weapon_target_list").append('<div class="weapon_target" id="weapon_target_' + p + '">' + players[p][0] + '</div>')
     }
 }
 
 function read_attributes() {
     let attr = decodeURI(window.location.search.substring(1));
-    console.log("WAT")
-    console.log(attr)
     if (attr){
         attr = attr.split('&');
         const load = attr[0].split('=')[1];
@@ -352,21 +448,33 @@ function read_attributes() {
             }
             const controllers = parseInt(attr[2].split('=')[1]);
             const rounds = parseInt(attr[3].split('=')[1]);
-            return {mode: load, players: players, controllers: controllers, rounds: rounds};
+            let use_weapons = false
+            if (attr[4].split('=')[1] === "true"){
+                use_weapons = true
+            }
+            return {mode: load, players: players, controllers: controllers, rounds: rounds, use_weapons:use_weapons};
         } else if (load === 'test'){
-            console.log("test?")
             let pc = 10
             let rc = 24
             let ctrl = 4
+            let wp = false
             for (let a = 1; a < attr.length; a++) {
                 if (attr[a].split('=')[0] === "players"){
-                    pc = attr[a].split('=')[1]
+                    pc = parseInt(attr[a].split('=')[1])
                 }
                 if (attr[a].split('=')[0] === "rounds"){
-                    rc = attr[a].split('=')[1]
+                    rc = parseInt(attr[a].split('=')[1])
                 }
                 if (attr[a].split('=')[0] === "controllers"){
-                    ctrl = attr[a].split('=')[1]
+                    ctrl = parseInt(attr[a].split('=')[1])
+                }
+                if (attr[a].split('=')[0] === "weapons"){
+                    wp = (attr[a].split('=')[1])
+                    if (wp === "true") {
+                        wp = true;
+                    } else {
+                        wp = false;
+                    }
                 }
             }
             let rspnames = rpnames
@@ -382,7 +490,7 @@ function read_attributes() {
             for (let p = 0; p < pc; p++) {
                 players.push([rspnames[p], rsicons[p]]);
             }
-            return {mode: "init", players: players, controllers: ctrl, rounds: rc};
+            return {mode: "init", players: players, controllers: ctrl, rounds: rc, use_weapons:wp};
 
         } else {
             return {mode: load};
