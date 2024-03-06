@@ -302,7 +302,7 @@ $(document).ready(function () {
         window.location.href = 'scoreboard.html?load=' + load +
             '&players=' + encodeURI(players) +
             '&controllers=' + $('#input_controllers').val() +
-            '&rounds=' + $('#input_rounds').val();
+            '&rounds=' + $('#input_rounds').val() + '&weapons=' + weapons;
 
     }
 
@@ -331,7 +331,7 @@ $(document).ready(function () {
     }
 });
 
-
+let weapons = "false"
 function create_icon_buttons(normal, special, menu){
     let hotomolo = '';
     let icons = [];
