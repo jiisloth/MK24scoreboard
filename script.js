@@ -5,10 +5,10 @@ let is_online = false
 let gamecode = ""
 
 let weapons = {
-    0: {"name": "Send friends", "show_target_list": true, "duration": 0},
-    1: {"name": "Shit on", "show_target_list": true, "duration": 5 * 60},
-    2: {"name": "Ban driver", "show_target_list": true, "duration": 0},
-    3: {"name": "Re-Roll shaders", "show_target_list": false, "duration": 0}
+    0: {"name": "Send friends", "show_target_list": true},
+    1: {"name": "Shit on", "show_target_list": true},
+    2: {"name": "Ban driver", "show_target_list": true},
+    3: {"name": "Re-Roll shaders", "show_target_list": false}
 }
 let weapon_in_use = {
     "shooter": null,
@@ -308,10 +308,8 @@ function use_weapon(){
     let weapon = weapons[weapon_in_use["weapon"]]
     if ((weapon["show_target_list"] && weapon_in_use["target"] !== null) || (weapon["show_target_list"] === false)){
         $("#weapon_menu").hide()
-        let use = {"target": weapon_in_use["target"], "shooter": weapon_in_use["shooter"], "weapon": weapon_in_use["weapon"], "timestamp":Date.now(), "end_time": 0}
-        if (weapon["duration"] !== 0){
-            use["end_time"] = Date.now() + weapon["duration"]*1000
-        }
+        let current_round = get_played()
+        let use = {"target": weapon_in_use["target"], "shooter": weapon_in_use["shooter"], "weapon": weapon_in_use["weapon"], "round_of_use": current_round}
         weapon_usage.push(use)
         localStorage.weapon_usage = JSON.stringify(weapon_usage);
         send_data({"type": "weapon_use", "weapon_use": use})
@@ -321,6 +319,15 @@ function use_weapon(){
         draw_weapons()
 
     }
+}
+
+function get_played(){
+    let last_state = states[states.length -1]
+    let total = 0
+    for (let i = 0; i < last_state.wins.length; i ++){
+        total += last_state.wins[i]
+    }
+    return total
 }
 
 function draw_weapons(){
@@ -336,7 +343,11 @@ function open_weapon_menu(shooter, weapon_id){
     let weapon = weapons[weapon_id]
     $("#weapon_menu").show()
     $("#weapon_name").html(weapon["name"])
-    $("#weapon_user_name").html(settings.players[shooter][0])
+    if (shooter === 999){
+        $("#weapon_user_name").html("Admin")
+    } else {
+        $("#weapon_user_name").html(settings.players[shooter][0])
+    }
     $(".targeted_player").removeClass(".targeted_player")
     weapon_in_use["target"] = null;
     weapon_in_use["shooter"] = shooter;

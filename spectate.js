@@ -23,10 +23,10 @@ socket.addEventListener('open', function (event) {
 });
 
 let weapons = {
-    0: {"name": "LÄHETÄ TUKEA", "show_target_list": true, "duration": 0},
-    1: {"name": "KASA PASKAA", "show_target_list": true, "duration": 5 * 60},
-    2: {"name": "KORTTI POIS", "show_target_list": true, "duration": 0},
-    3: {"name": "OTETAANPA UUSIKSI", "show_target_list": false, "duration": 0}
+    0: {"name": "LÄHETÄ TUKEA", "show_target_list": true},
+    1: {"name": "KASA PASKAA", "show_target_list": true},
+    2: {"name": "KORTTI POIS", "show_target_list": true},
+    3: {"name": "OMSTART", "show_target_list": false}
 }
 // Listen for messages
 socket.addEventListener('message', function (event) {
@@ -66,10 +66,14 @@ socket.addEventListener('message', function (event) {
         weapon_usage.push(wpu_use)
         $('#weapon_used_blink').show()
         let text = ""
+        let shootername = "Admin"
+        if (wpu_use["shooter"] !== 999){
+            shootername = settings.players[wpu_use["shooter"]][0]
+        }
         if (wpu_use["target"] === null){
-            text = settings.players[wpu_use["shooter"]][0] + " käytti " + weapons[wpu_use["weapon"]]["name"] + "!"
+            text = shootername + " käytti " + weapons[wpu_use["weapon"]]["name"] + "!"
         } else {
-            text = settings.players[wpu_use["shooter"]][0] + " käytti " + weapons[wpu_use["weapon"]]["name"] + " kohteeseen " + settings.players[wpu_use["target"]][0] + "!"
+            text = shootername + " käytti " + weapons[wpu_use["weapon"]]["name"] + " kohteeseen " + settings.players[wpu_use["target"]][0] + "!"
         }
         $('#weapon_used_blink').html(text);
         setTimeout(function (){
@@ -595,6 +599,8 @@ function draw_state(state, controllers, mapstate, maplist) {
         $('#p' + i +' > .character').css({"-webkit-transform":"translate("+left+"px,"+bottom+"px)"});
         if (layout === "stream" && aspectratio === "threefour"){
             $('#p' + i + ' > .character').css("z-index", 50 - order.indexOf(i));
+        } else {
+            $('#p' + i + ' > .character').css("z-index", 50 + i);
         }
         $('#p' + i + ' > div > div > .stats > .wins').html(state.wins[i]);
 

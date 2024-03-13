@@ -257,3 +257,7 @@ input.selected{
 .checkbox input[type="checkbox"]:focus + label::before {
     outline: rgb(59, 153, 252) auto 5px;
 }
+
+.extraplayericon{
+    display: none;
+}

@@ -1,3 +1,6 @@
+
+
+
 $(document).ready(function () {
     // INIT
     $('#start_menu').show();
@@ -13,9 +16,10 @@ $(document).ready(function () {
     const playericons = ['mario', 'luigi', 'peach', 'daisy', 'bowser', 'koopa', 'yoshi', 'donkeykong', 'boo', 'toad',
         'toadette', 'klunk', 'chuck', 'bubble', 'chiken', 'link', 'pikachu', 'sonic', 'samus', 'mage', 'bowsette',
         'bowsette2'];
+    const extraplayericons = ['OULU', 'TURKU', 'TANPERE', 'JYVASKYLA', 'OTANIEMI', 'LAPPEEN_RANTA'];
     const specialicons = ['misato2', 'misato', 'zerotwo', 'zerotwotwo', 'megaman', 'barret', 'kratos', 'hiire', 'Nyan', 'geralt', 'luffy', 'vanska'];
 
-    player_menu = create_icon_buttons(playericons,specialicons, player_menu);
+    player_menu = create_icon_buttons(playericons,specialicons,extraplayericons, player_menu);
 
     let current_icon = "";
     let players = [];
@@ -293,6 +297,8 @@ $(document).ready(function () {
             $('#icon_geralt').removeClass('mystery')
         } else if (name.toLowerCase() === 'kalevi' || name.toLowerCase() === 'kal3vi') {
             $('#icon_vanska').removeClass('mystery')
+        } else if (name.toLowerCase() === 'titeenit') {
+            do_titeenit()
         }
     }
     function start_scoreboard(load) {
@@ -332,7 +338,7 @@ $(document).ready(function () {
 });
 
 let weapons = "false"
-function create_icon_buttons(normal, special, menu){
+function create_icon_buttons(normal, special, extra, menu){
     let hotomolo = '';
     let icons = [];
     let all_icons = [];
@@ -354,12 +360,24 @@ function create_icon_buttons(normal, special, menu){
             icons = []
         }
     }
+    for (let i = 0; i < extra.length; i++){
+        hotomolo += '<div id="icon_' + extra[i] + '" class="icon menu_item extraplayericon"><img src="images/playerIcons/' + extra[i] + '.png"></div>'
+        icons.push('icon_' + extra[i]);
+        if (items_on_row === icons.length){
+            all_icons.push(icons.slice());
+            icons = []
+        }
+    }
     all_icons.push(icons.slice());
 
     icons_box.html(hotomolo);
     return menu.concat(all_icons)
 }
 
+function do_titeenit(){
+    weapons = true
+    $('.extraplayericon').show()
+}
 
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;

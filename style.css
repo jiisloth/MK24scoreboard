@@ -285,6 +285,10 @@ body, html{
     flex-direction: row;
     justify-content: space-between;
 }
+.admin_weapons{
+    z-index: 10000;
+    position: absolute;
+}
 .weapon{
     flex-grow: 1;
     align-content: center;
